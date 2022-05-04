@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.is;
 public class ReactiveGreetingResourceTest {
 
     @Test
-    public void testHelloEndpoint() {
+    public void testAvailability() {
         given()
-          .when().get("/reservation")
+          .when().get("/reservation/availability")
           .then()
              .statusCode(200);
     }
