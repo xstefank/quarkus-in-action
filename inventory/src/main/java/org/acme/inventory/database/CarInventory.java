@@ -24,12 +24,14 @@ public class CarInventory {
 
     private void initialData() {
         Car mazda = new Car();
+        mazda.id = 1L;
         mazda.manufacturer = "Mazda";
         mazda.model = "6";
         mazda.licensePlateNumber = "ABC123";
         cars.add(mazda);
 
         Car ford = new Car();
+        ford.id = 2L;
         ford.manufacturer = "Ford";
         ford.model = "Mustang";
         ford.licensePlateNumber = "XYZ987";
