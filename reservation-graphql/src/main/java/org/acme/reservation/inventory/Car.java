@@ -7,6 +7,9 @@ public class Car {
     public String manufacturer;
     public String model;
 
+    public Car() {
+    }
+
     public Car(Long id, String licensePlateNumber, String manufacturer, String model) {
         this.id = id;
         this.licensePlateNumber = licensePlateNumber;

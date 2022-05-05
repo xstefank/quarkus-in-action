@@ -11,7 +11,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import io.smallrye.graphql.client.GraphQLClient;
 import org.acme.reservation.inventory.Car;
+import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
 import org.jboss.resteasy.reactive.RestQuery;
 
@@ -20,10 +23,11 @@ import org.jboss.resteasy.reactive.RestQuery;
 public class ReservationResource {
 
     private final ReservationsRepository reservationsRepository;
+
     private final InventoryClient inventoryClient;
 
     public ReservationResource(ReservationsRepository reservations,
-                               InventoryClient inventoryClient) {
+                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient) {
         this.reservationsRepository = reservations;
         this.inventoryClient = inventoryClient;
     }
