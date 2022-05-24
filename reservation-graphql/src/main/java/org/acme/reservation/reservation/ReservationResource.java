@@ -16,6 +16,9 @@ import io.smallrye.graphql.client.GraphQLClient;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
+import org.acme.reservation.rental.Rental;
+import org.acme.reservation.rental.RentalClient;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestQuery;
 
 @Path("reservation")
@@ -26,10 +29,14 @@ public class ReservationResource {
 
     private final InventoryClient inventoryClient;
 
+    private final RentalClient rentalClient;
+
     public ReservationResource(ReservationsRepository reservations,
-                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient) {
+                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient,
+                               @RestClient RentalClient rentalClient) {
         this.reservationsRepository = reservations;
         this.inventoryClient = inventoryClient;
+        this.rentalClient = rentalClient;
     }
 
     @GET
@@ -57,6 +64,9 @@ public class ReservationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Reservation make(Reservation reservation) {
-        return reservationsRepository.save(reservation);
+        Reservation result = reservationsRepository.save(reservation);
+        Long userId = 1L;
+        Rental rental = rentalClient.start(userId, result.id);
+        return result;
     }
 }
