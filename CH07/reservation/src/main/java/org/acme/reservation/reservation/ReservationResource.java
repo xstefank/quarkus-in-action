@@ -19,11 +19,14 @@ import org.acme.reservation.inventory.InventoryClient;
 import org.acme.reservation.rental.Rental;
 import org.acme.reservation.rental.RentalClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestQuery;
 
 @Path("reservation")
 @Produces(MediaType.APPLICATION_JSON)
 public class ReservationResource {
+
+    private static final Logger LOGGER = Logger.getLogger(ReservationResource.class);
 
     private final ReservationsRepository reservationsRepository;
 
@@ -65,8 +68,18 @@ public class ReservationResource {
     @POST
     public Reservation make(Reservation reservation) {
         Reservation result = reservationsRepository.save(reservation);
+        LOGGER.info("Successfully reserved reservation " + result);
         Long userId = 1L;
-        Rental rental = rentalClient.start(userId, result.id);
+        if (reservation.startDay.equals(LocalDate.now())) {
+            // start the rental at the Rental service
+            Rental rental = rentalClient.start(userId, result.id);
+            LOGGER.info("Successfully started rental " + rental);
+        }
         return result;
+    }
+
+    @GET
+    public List<Reservation> getReservations() {
+        return reservationsRepository.findAll();
     }
 }

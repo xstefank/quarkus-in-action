@@ -12,4 +12,14 @@ public class Reservation {
     public boolean isReserved(LocalDate startDay, LocalDate endDay) {
         return (!(this.endDay.isBefore(startDay) || this.startDay.isAfter(endDay)));
     }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+            "id=" + id +
+            ", carId=" + carId +
+            ", startDay=" + startDay +
+            ", endDay=" + endDay +
+            '}';
+    }
 }
