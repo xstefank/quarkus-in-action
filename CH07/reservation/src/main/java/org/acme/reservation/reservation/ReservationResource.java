@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -13,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.smallrye.graphql.client.GraphQLClient;
+import org.acme.reservation.entity.Reservation;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
@@ -28,16 +30,12 @@ public class ReservationResource {
 
     private static final Logger LOGGER = Logger.getLogger(ReservationResource.class);
 
-    private final ReservationsRepository reservationsRepository;
-
     private final InventoryClient inventoryClient;
 
     private final RentalClient rentalClient;
 
-    public ReservationResource(ReservationsRepository reservations,
-                               @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient,
+    public ReservationResource(@GraphQLClient("inventory") GraphQLInventoryClient inventoryClient,
                                @RestClient RentalClient rentalClient) {
-        this.reservationsRepository = reservations;
         this.inventoryClient = inventoryClient;
         this.rentalClient = rentalClient;
     }
@@ -54,7 +52,7 @@ public class ReservationResource {
         }
 
         // get all current reservations
-        List<Reservation> reservations = reservationsRepository.findAll();
+        List<Reservation> reservations = Reservation.listAll();
         // for each reservation, remove the car from the map
         for (Reservation reservation : reservations) {
             if (reservation.isReserved(startDate, endDate)) {
@@ -66,20 +64,21 @@ public class ReservationResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
+    @Transactional
     public Reservation make(Reservation reservation) {
-        Reservation result = reservationsRepository.save(reservation);
-        LOGGER.info("Successfully reserved reservation " + result);
+        reservation.persist();
+        LOGGER.info("Successfully reserved reservation " + reservation);
         Long userId = 1L;
         if (reservation.startDay.equals(LocalDate.now())) {
             // start the rental at the Rental service
-            Rental rental = rentalClient.start(userId, result.id);
+            Rental rental = rentalClient.start(userId, reservation.id);
             LOGGER.info("Successfully started rental " + rental);
         }
-        return result;
+        return reservation;
     }
 
     @GET
     public List<Reservation> getReservations() {
-        return reservationsRepository.findAll();
+        return Reservation.listAll();
     }
 }
