@@ -1,49 +1,56 @@
 
 package org.acme.inventory.service;
 
-import javax.inject.Inject;
-
 import com.google.protobuf.Empty;
-
-import org.acme.inventory.model.Car;
-import org.acme.inventory.database.CarInventory;
-import org.acme.inventory.model.InventoryServiceGrpc;
-import org.acme.inventory.model.InsertCarRequest;
-
 import io.grpc.stub.StreamObserver;
 import io.quarkus.grpc.GrpcService;
+import io.quarkus.narayana.jta.QuarkusTransaction;
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import org.acme.inventory.model.Car;
+import org.acme.inventory.model.InsertCarRequest;
+import org.acme.inventory.model.InventoryService;
+import org.acme.inventory.model.RemoveCarRequest;
+import org.acme.inventory.repository.CarRepository;
 import org.jboss.logging.Logger;
 
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import java.util.Optional;
+
 @GrpcService
-public class GrpcInventoryService extends InventoryServiceGrpc.InventoryServiceImplBase {
+public class GrpcInventoryService implements InventoryService {
 
-  private static final Logger LOGGER = Logger.getLogger(GrpcInventoryService.class);
+    private static final Logger LOGGER = Logger.getLogger(GrpcInventoryService.class);
 
-  @Inject
-  CarInventory inventory;
+    @Inject
+    CarRepository carRepository;
 
-  @Override
-    public StreamObserver<InsertCarRequest> add(StreamObserver<Empty> responseObserver) {
-    return new io.grpc.stub.StreamObserver<InsertCarRequest>() {
-        @Override
-        public void onNext(InsertCarRequest request) {
-          Car car = new Car();
-          car.licensePlateNumber = request.getLicensePlateNumber();
-          car.manufacturer = request.getManufacturer();
-          car.model = request.getModel();
-          inventory.getCars().add(car);
-        }
+    @Override
+    @Blocking
+    @Transactional
+    public Uni<Empty> remove(RemoveCarRequest request) {
+        Optional<Car> optionalCar = carRepository.findByLicensePlateNumberOptional(request.getLicensePlateNumber());
+        optionalCar.ifPresent(car -> carRepository.delete(car));
+        return Uni.createFrom().item(Empty.newBuilder().build());
+    }
 
-        @Override
-        public void onCompleted() {
-          responseObserver.onNext(Empty.newBuilder().build());
-          responseObserver.onCompleted();
-        }
-
-        @Override
-        public void onError(Throwable t) {
-          LOGGER.error(t.getMessage());
-        }
-    };
-  }
+    @Override
+    @Blocking
+    @Transactional
+    public Uni<Empty> add(Multi<InsertCarRequest> request) {
+        return request
+            .map(r -> {
+                Car car = new Car();
+                car.licensePlateNumber = r.getLicensePlateNumber();
+                car.manufacturer = r.getManufacturer();
+                car.model = r.getModel();
+                LOGGER.error("Persisting " + car);
+                return car;
+            })
+            .onItem().invoke(car -> carRepository.persist(car))
+            .collect().last()
+            .map(l -> Empty.newBuilder().build());
+    }
 }
