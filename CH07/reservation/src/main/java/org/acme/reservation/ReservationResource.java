@@ -13,7 +13,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.graphql.client.GraphQLClient;
+import io.smallrye.mutiny.Uni;
 import org.acme.reservation.entity.Reservation;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
@@ -52,7 +54,8 @@ public class ReservationResource {
         }
 
         // get all current reservations
-        List<Reservation> reservations = Reservation.listAll();
+        // not the intended way with reactive types, we block here for rewrite simplicity
+        List<Reservation> reservations = Reservation.<Reservation>listAll().await().indefinitely();
         // for each reservation, remove the car from the map
         for (Reservation reservation : reservations) {
             if (reservation.isReserved(startDate, endDate)) {
@@ -64,21 +67,22 @@ public class ReservationResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    @Transactional
-    public Reservation make(Reservation reservation) {
-        reservation.persist();
-        LOGGER.info("Successfully reserved reservation " + reservation);
-        Long userId = 1L;
-        if (reservation.startDay.equals(LocalDate.now())) {
-            // start the rental at the Rental service
-            Rental rental = rentalClient.start(userId, reservation.id);
-            LOGGER.info("Successfully started rental " + rental);
-        }
-        return reservation;
+    @ReactiveTransactional
+    public Uni<Reservation> make(Reservation reservation) {
+        return reservation.<Reservation>persist().onItem()
+            .invoke(persistedReservation -> {
+                LOGGER.info("Successfully reserved reservation " + persistedReservation);
+                Long userId = 1L;
+                if (persistedReservation.startDay.equals(LocalDate.now())) {
+                    // start the rental at the Rental service
+                    Rental rental = rentalClient.start(userId, persistedReservation.id);
+                    LOGGER.info("Successfully started rental " + rental);
+                }
+            });
     }
 
     @GET
-    public List<Reservation> getReservations() {
+    public Uni<List<Reservation>> getReservations() {
         return Reservation.listAll();
     }
 }
