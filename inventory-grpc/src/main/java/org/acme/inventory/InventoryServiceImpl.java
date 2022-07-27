@@ -1,5 +1,5 @@
 
-package org.acme.inventory.service;
+package org.acme.inventory;
 
 import java.util.Optional;
 
@@ -15,30 +15,25 @@ import org.acme.inventory.model.RemoveCarRequest;
 import org.jboss.logging.Logger;
 
 import io.quarkus.grpc.GrpcService;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 @GrpcService
-public class MutinyGrpcInventoryServiceImpl implements InventoryService {
+public class InventoryServiceImpl implements InventoryService {
 
-  private static final Logger LOGGER = Logger.getLogger(MutinyGrpcInventoryServiceImpl.class);
+  private static final Logger LOGGER = Logger.getLogger(InventoryServiceImpl.class);
 
   @Inject
   CarInventory inventory;
 
   @Override
-    public Uni<Empty> add(Multi<InsertCarRequest> request) {
-            return request
-            .map(r -> {
-                Car car = new Car();
-                car.licensePlateNumber = r.getLicensePlateNumber();
-                car.manufacturer = r.getManufacturer();
-                car.model = r.getModel();
-                LOGGER.error("Persisting " + car);
-                return car;
-            }).onItem().invoke(car -> inventory.getCars().add(car))
-              .collect().last()
-              .map(l -> Empty.newBuilder().build());
+    public Uni<Empty> add(InsertCarRequest request) {
+    Car car = new Car();
+    car.licensePlateNumber = request.getLicensePlateNumber();
+    car.manufacturer = request.getManufacturer();
+    car.model = request.getModel();
+    LOGGER.error("Persisting " + car);
+    inventory.getCars().add(car);
+    return Uni.createFrom().item(Empty.newBuilder().build());
   }
 
   @Override

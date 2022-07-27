@@ -19,6 +19,6 @@ message RemoveCarRequest {
 }
 
 service InventoryService {
-  rpc add(stream InsertCarRequest) returns (google.protobuf.Empty) {}
+  rpc add(InsertCarRequest) returns (google.protobuf.Empty) {}
   rpc remove(RemoveCarRequest) returns (google.protobuf.Empty) {}
 }
