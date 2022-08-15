@@ -3,16 +3,21 @@ package org.acme.reservation;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.DisabledOnIntegrationTest;
+import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.acme.reservation.inventory.Car;
+import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.reservation.Reservation;
 import org.acme.reservation.rest.ReservationResource;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -45,6 +50,14 @@ public class ReservationResourceTest {
     @TestHTTPEndpoint(ReservationResource.class)
     @TestHTTPResource("availability")
     URL availability;
+
+    @BeforeAll
+    public static void setup() {
+        GraphQLInventoryClient mock = Mockito.mock(GraphQLInventoryClient.class);
+        Car peugeot = new Car(1L, "ABC 123", "Peugeot", "406");
+        Mockito.when(mock.allCars()).thenReturn(Collections.singletonList(peugeot));
+        QuarkusMock.installMockForType(mock, GraphQLInventoryClient.class);
+    }
 
     // uses mocks
     @DisabledOnIntegrationTest(forArtifactTypes = DisabledOnIntegrationTest.ArtifactType.NATIVE_BINARY)
@@ -88,7 +101,7 @@ public class ReservationResourceTest {
             .get(availability)
             .then()
             .statusCode(200)
-            .body("findAll { car -> car.id == 1}", hasSize(0));
+            .body("findAll { car -> car.id == " + car.id + "}", hasSize(0));
     }
 
 
