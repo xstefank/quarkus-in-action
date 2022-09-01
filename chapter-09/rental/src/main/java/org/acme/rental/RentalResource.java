@@ -1,7 +1,9 @@
 package org.acme.rental;
 
 import org.acme.rental.entity.Rental;
+import org.jboss.resteasy.reactive.RestPath;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -16,6 +18,7 @@ public class RentalResource {
 
     @Path("/start/{userId}/{reservationId}")
     @POST
+    @Transactional
     public Rental start(Long userId, Long reservationId) {
         Rental rental = new Rental();
         rental.userId = userId;
@@ -30,6 +33,7 @@ public class RentalResource {
 
     @PUT
     @Path("/end/{userId}/{reservationId}")
+    @Transactional
     public Rental end(Long userId, Long reservationId) {
         Optional<Rental> optionalRental = Rental
             .findByUserAndReservationIdsOptional(userId, reservationId);
@@ -54,5 +58,15 @@ public class RentalResource {
     @Path("/active")
     public List<Rental> listActive() {
         return Rental.listActive();
+    }
+
+    @PUT
+    @Path("prolong/{rentalId}")
+    @Transactional
+    public Rental prolongRental(@RestPath Long rentalId, int numberOfDays) {
+        Rental rental = Rental.<Rental>findByIdOptional(rentalId)
+            .orElseThrow(() -> new NotFoundException("Rental not found: " + rentalId));
+        rental.endDate = rental.endDate.plusDays(numberOfDays);
+        return rental;
     }
 }

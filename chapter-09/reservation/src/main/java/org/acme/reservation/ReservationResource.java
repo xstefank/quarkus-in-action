@@ -92,12 +92,16 @@ public class ReservationResource {
         return Uni.combine().all().unis(invoiceUni, persistUni)
             .combinedWith((invoiceAck, persistedReservation) -> {
                 LOGGER.info("Successfully reserved reservation " + persistedReservation);
+                return persistedReservation;
+            })
+                .onItem().call(persistedReservation -> {
                 if (persistedReservation.startDay.equals(LocalDate.now()) && reservation.paid) {
                     // start the rental at the Rental service
-                    Rental rental = rentalClient.start(userId, persistedReservation.id);
-                    LOGGER.info("Successfully started rental " + rental);
+                    return rentalClient.start(userId, persistedReservation.id)
+                        .onItem().invoke(response -> LOGGER.info("Successfully started rental " + response))
+                        .replaceWith(persistedReservation);
                 }
-                return persistedReservation;
+                return Uni.createFrom().item(persistedReservation);
             });
     }
 

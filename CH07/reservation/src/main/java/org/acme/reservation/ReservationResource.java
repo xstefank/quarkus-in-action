@@ -70,14 +70,17 @@ public class ReservationResource {
     @ReactiveTransactional
     public Uni<Reservation> make(Reservation reservation) {
         return reservation.<Reservation>persist().onItem()
-            .invoke(persistedReservation -> {
+            .call(persistedReservation -> {
                 LOGGER.info("Successfully reserved reservation " + persistedReservation);
                 Long userId = 1L;
                 if (persistedReservation.startDay.equals(LocalDate.now())) {
                     // start the rental at the Rental service
-                    Rental rental = rentalClient.start(userId, persistedReservation.id);
-                    LOGGER.info("Successfully started rental " + rental);
+                    return rentalClient.start(userId, persistedReservation.id)
+                        .onItem().invoke(response -> LOGGER.info("Successfully started rental " + response))
+                        .replaceWith(persistedReservation);
                 }
+
+                return Uni.createFrom().item(persistedReservation);
             });
     }
 

@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @Entity
 public class Reservation extends PanacheEntity {
 
-    public Long id;
     public Long carId;
     public LocalDate startDay;
     public LocalDate endDay;
