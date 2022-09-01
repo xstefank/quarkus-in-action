@@ -12,7 +12,7 @@ import org.jboss.resteasy.reactive.RestPath;
 public interface RentalClient {
 
     @POST
-    @Path("/start/{userId}/{reservationId}")
-    Uni<Rental> start(@RestPath Long userId, @RestPath Long reservationId);
+    @Path("/start/{userId}/{reservationId}/{carId}")
+    Uni<Rental> start(@RestPath Long userId, @RestPath Long reservationId, @RestPath Long carId);
 
 }

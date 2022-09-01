@@ -97,7 +97,7 @@ public class ReservationResource {
                 .onItem().call(persistedReservation -> {
                 if (persistedReservation.startDay.equals(LocalDate.now()) && reservation.paid) {
                     // start the rental at the Rental service
-                    return rentalClient.start(userId, persistedReservation.id)
+                    return rentalClient.start(userId, persistedReservation.id, persistedReservation.carId)
                         .onItem().invoke(response -> LOGGER.info("Successfully started rental " + response))
                         .replaceWith(persistedReservation);
                 }

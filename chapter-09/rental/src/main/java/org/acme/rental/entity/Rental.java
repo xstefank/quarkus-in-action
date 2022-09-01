@@ -9,6 +9,8 @@ import java.util.Optional;
 public class Rental extends PanacheMongoEntity {
 
     public Long userId;
+
+    public Long carId;
     public Long reservationId;
     public LocalDate startDate;
     public LocalDate endDate;
