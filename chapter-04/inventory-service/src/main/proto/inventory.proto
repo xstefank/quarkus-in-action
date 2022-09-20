@@ -5,7 +5,6 @@ option java_package = "org.acme.inventory.model";
 option java_outer_classname = "InventoryProtos";
 
 package inventory;
-import "google/protobuf/empty.proto";
 
 message InsertCarRequest {
     string licensePlateNumber = 1;
@@ -17,7 +16,13 @@ message RemoveCarRequest {
     string licensePlateNumber = 1;
 }
 
+message CarResponse {
+    string licensePlateNumber = 1;
+    string manufacturer = 2;
+    string model = 3;
+}
+
 service InventoryService {
-  rpc add(stream InsertCarRequest) returns (google.protobuf.Empty) {}
-  rpc remove(RemoveCarRequest) returns (google.protobuf.Empty) {}
+    rpc add(InsertCarRequest) returns (CarResponse) {}
+    rpc remove(RemoveCarRequest) returns (CarResponse) {}
 }
