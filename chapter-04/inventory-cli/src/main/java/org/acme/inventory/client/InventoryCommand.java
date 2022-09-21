@@ -36,10 +36,11 @@ public class InventoryCommand implements QuarkusApplication {
     public void add(String licensePlateNumber, String manufacturer,
                     String model) {
         inventory.add(InsertCarRequest.newBuilder()
-            .setLicensePlateNumber(licensePlateNumber)
-            .setManufacturer(manufacturer)
-            .setModel(model)
-            .build())
+                .setLicensePlateNumber(licensePlateNumber)
+                .setManufacturer(manufacturer)
+                .setModel(model)
+                .build())
+            .onItem().invoke(carResponse -> System.out.println("Inserted new car " + carResponse))
             .await().indefinitely();
     }
 
@@ -47,6 +48,7 @@ public class InventoryCommand implements QuarkusApplication {
         inventory.remove(RemoveCarRequest.newBuilder()
             .setLicensePlateNumber(licensePlateNumber)
             .build())
+            .onItem().invoke(carResponse -> System.out.println("Removed car " + carResponse))
             .await().indefinitely();
     }
 }
