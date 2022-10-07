@@ -12,6 +12,6 @@ public interface RentalClient {
 
     @POST
     @Path("/start/{userId}/{reservationId}")
-    Rental start(@RestPath Long userId,
+    Rental start(@RestPath String userId,
                  @RestPath Long reservationId);
 }

@@ -5,18 +5,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 
 import io.smallrye.graphql.client.GraphQLClient;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
-import org.acme.reservation.rental.Rental;
 import org.acme.reservation.rental.RentalClient;
 import org.acme.reservation.reservation.Reservation;
 import org.acme.reservation.reservation.ReservationsRepository;
@@ -31,6 +33,9 @@ public class ReservationResource {
     private final InventoryClient inventoryClient;
     private final RentalClient rentalClient;
 
+    @Inject
+    SecurityContext context;
+
     public ReservationResource(ReservationsRepository reservations,
                                @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient,
                                @RestClient RentalClient rentalClient) {
@@ -42,11 +47,10 @@ public class ReservationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Reservation make(Reservation reservation) {
+        reservation.userId = context.getUserPrincipal() != null ? context.getUserPrincipal().getName() : null;
         Reservation result = reservationsRepository.save(reservation);
-        // this is just a dummy value for the time being
-        String userId = "x";
         if (reservation.startDay.equals(LocalDate.now())) {
-            rentalClient.start(userId, result.id);
+            rentalClient.start(reservation.userId, result.id);
         }
         return result;
     }
@@ -72,5 +76,16 @@ public class ReservationResource {
             }
         }
         return carsById.values();
+    }
+
+
+    @GET
+    @Path("all")
+    public Collection<Reservation> allReservations() {
+        String userId = context.getUserPrincipal() != null ? context.getUserPrincipal().getName() : null;
+        return reservationsRepository.findAll()
+            .stream()
+            .filter(reservation -> userId == null || reservation.userId.equals(userId))
+            .collect(Collectors.toList());
     }
 }

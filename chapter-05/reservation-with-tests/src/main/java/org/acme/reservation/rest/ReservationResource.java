@@ -42,9 +42,10 @@ public class ReservationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Reservation make(Reservation reservation) {
-        Reservation result = reservationsRepository.save(reservation);
         // this is just a dummy value for the time being
-        Long userId = 1L;
+        String userId = "dummy";
+        reservation.userId = userId;
+        Reservation result = reservationsRepository.save(reservation);
         if (reservation.startDay.equals(LocalDate.now())) {
             rentalClient.start(userId, result.id);
         }

@@ -5,11 +5,11 @@ import java.time.LocalDate;
 public class Rental {
 
     private final Long id;
-    private final Long userId;
+    private final String userId;
     private final Long reservationId;
     private final LocalDate startDate;
 
-    public Rental(Long id, Long userId, Long reservationId,
+    public Rental(Long id, String userId, Long reservationId,
                   LocalDate startDate) {
         this.id = id;
         this.userId = userId;
@@ -21,7 +21,7 @@ public class Rental {
         return id;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 

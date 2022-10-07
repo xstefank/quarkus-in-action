@@ -19,7 +19,7 @@ public class RentalResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Rental start(Long userId,
+    public Rental start(String userId,
                         Long reservationId) {
         Log.infof("Starting rental for %s with reservation %s", userId, reservationId);
         return new Rental(id.incrementAndGet(), userId, reservationId,
