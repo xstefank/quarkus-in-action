@@ -1,6 +1,7 @@
 package org.acme.inventory.grpc;
 
 import io.quarkus.grpc.GrpcService;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.acme.inventory.database.CarInventory;
@@ -9,15 +10,12 @@ import org.acme.inventory.model.CarResponse;
 import org.acme.inventory.model.InsertCarRequest;
 import org.acme.inventory.model.InventoryService;
 import org.acme.inventory.model.RemoveCarRequest;
-import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 @GrpcService
 public class InventoryServiceImpl implements InventoryService {
-
-    private static final Logger LOGGER = Logger.getLogger(InventoryServiceImpl.class);
 
     @Inject
     CarInventory inventory;
@@ -32,7 +30,7 @@ public class InventoryServiceImpl implements InventoryService {
                 car.model = request.getModel();
                 return car;
             }).onItem().invoke(car -> {
-                LOGGER.info("Persisting " + car);
+                Log.info("Persisting " + car);
                 inventory.getCars().add(car);
             }).map(car -> CarResponse.newBuilder()
                 .setLicensePlateNumber(car.licensePlateNumber)

@@ -1,6 +1,6 @@
 package org.acme.rental;
 
-import org.jboss.logging.Logger;
+import io.quarkus.logging.Log;
 
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,8 +13,6 @@ import javax.ws.rs.core.MediaType;
 @Path("/rental")
 public class RentalResource {
 
-    private static final Logger LOGGER = Logger.getLogger(RentalResource.class);
-
     private final AtomicLong id = new AtomicLong(0);
 
     @Path("/start/{userId}/{reservationId}")
@@ -23,7 +21,7 @@ public class RentalResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Rental start(Long userId,
                         Long reservationId) {
-        LOGGER.infof("Starting rental for %s with reservation %s", userId, reservationId);
+        Log.infof("Starting rental for %s with reservation %s", userId, reservationId);
         return new Rental(id.incrementAndGet(), userId, reservationId,
             LocalDate.now());
     }
