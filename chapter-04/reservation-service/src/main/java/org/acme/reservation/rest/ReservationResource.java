@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -50,4 +52,11 @@ public class ReservationResource {
         }
         return carsById.values();
     }
+
+    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    public Reservation make(Reservation reservation) {
+        return reservationsRepository.save(reservation);
+    }
+
 }
