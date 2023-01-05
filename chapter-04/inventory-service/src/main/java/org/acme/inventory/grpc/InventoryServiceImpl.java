@@ -2,6 +2,7 @@ package org.acme.inventory.grpc;
 
 import io.quarkus.grpc.GrpcService;
 import io.quarkus.logging.Log;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.acme.inventory.database.CarInventory;
 import org.acme.inventory.model.Car;
@@ -21,21 +22,25 @@ public class InventoryServiceImpl
     CarInventory inventory;
 
     @Override
-    public Uni<CarResponse> add(
-        InsertCarRequest request) {
-        Car car = new Car();
-        car.licensePlateNumber = request.getLicensePlateNumber();
-        car.manufacturer = request.getManufacturer();
-        car.model = request.getModel();
-        Log.info("Persisting " + car);
-        inventory.getCars().add(car);
-
-        return Uni.createFrom().item(CarResponse.newBuilder()
-            .setLicensePlateNumber(car.licensePlateNumber)
-            .setManufacturer(car.manufacturer)
-            .setModel(car.model)
-            .build());
+    public Multi<CarResponse>
+    add(Multi<InsertCarRequest> requests) {
+        return requests
+            .map(request -> {
+                Car car = new Car();
+                car.licensePlateNumber = request.getLicensePlateNumber();
+                car.manufacturer = request.getManufacturer();
+                car.model = request.getModel();
+                return car;
+            }).onItem().invoke(car -> {
+                Log.info("Persisting " + car);
+                inventory.getCars().add(car);
+            }).map(car -> CarResponse.newBuilder()
+                .setLicensePlateNumber(car.licensePlateNumber)
+                .setManufacturer(car.manufacturer)
+                .setModel(car.model)
+                .build());
     }
+
 
     @Override
     public Uni<CarResponse> remove(
