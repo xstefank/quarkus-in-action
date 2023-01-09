@@ -10,13 +10,12 @@ import org.acme.inventory.model.CarResponse;
 import org.acme.inventory.model.InsertCarRequest;
 import org.acme.inventory.model.InventoryService;
 import org.acme.inventory.model.RemoveCarRequest;
-import org.acme.inventory.service.GraphQLInventoryService;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 @GrpcService
-public class InventoryServiceImpl
+public class GrpcInventoryService
     implements InventoryService {
 
     @Inject

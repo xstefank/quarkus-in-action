@@ -9,7 +9,6 @@ import org.eclipse.microprofile.graphql.Query;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @GraphQLApi
 public class GraphQLInventoryService {
