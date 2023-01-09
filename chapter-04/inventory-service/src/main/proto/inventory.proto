@@ -20,6 +20,7 @@ message CarResponse {
   string licensePlateNumber = 1;
   string manufacturer = 2;
   string model = 3;
+  int64 id = 4;
 }
 
 service InventoryService {

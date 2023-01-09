@@ -9,9 +9,10 @@ import org.eclipse.microprofile.graphql.Query;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @GraphQLApi
-public class InventoryService {
+public class GraphQLInventoryService {
 
     @Inject
     CarInventory inventory;
@@ -23,6 +24,7 @@ public class InventoryService {
 
     @Mutation
     public Car register(Car car) {
+        car.id = CarInventory.ids.incrementAndGet();
         inventory.getCars().add(car);
         return car;
     }

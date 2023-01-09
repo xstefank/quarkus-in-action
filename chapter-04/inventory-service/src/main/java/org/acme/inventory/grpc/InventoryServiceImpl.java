@@ -10,6 +10,7 @@ import org.acme.inventory.model.CarResponse;
 import org.acme.inventory.model.InsertCarRequest;
 import org.acme.inventory.model.InventoryService;
 import org.acme.inventory.model.RemoveCarRequest;
+import org.acme.inventory.service.GraphQLInventoryService;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -30,6 +31,7 @@ public class InventoryServiceImpl
                 car.licensePlateNumber = request.getLicensePlateNumber();
                 car.manufacturer = request.getManufacturer();
                 car.model = request.getModel();
+                car.id = CarInventory.ids.incrementAndGet();
                 return car;
             }).onItem().invoke(car -> {
                 Log.info("Persisting " + car);
@@ -38,6 +40,7 @@ public class InventoryServiceImpl
                 .setLicensePlateNumber(car.licensePlateNumber)
                 .setManufacturer(car.manufacturer)
                 .setModel(car.model)
+                .setId(car.id)
                 .build());
     }
 
@@ -57,6 +60,7 @@ public class InventoryServiceImpl
                 .setLicensePlateNumber(removedCar.licensePlateNumber)
                 .setManufacturer(removedCar.manufacturer)
                 .setModel(removedCar.model)
+                .setId(removedCar.id)
                 .build());
         }
         return Uni.createFrom().nullItem();

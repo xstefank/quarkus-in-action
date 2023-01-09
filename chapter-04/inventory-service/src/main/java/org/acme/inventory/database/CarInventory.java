@@ -6,11 +6,14 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 @ApplicationScoped
 public class CarInventory {
 
     private List<Car> cars;
+
+    public static final AtomicLong ids = new AtomicLong(0);
 
     @PostConstruct
     void initialize() {
@@ -24,14 +27,14 @@ public class CarInventory {
 
     private void initialData() {
         Car mazda = new Car();
-        mazda.id = 1L;
+        mazda.id = ids.incrementAndGet();
         mazda.manufacturer = "Mazda";
         mazda.model = "6";
         mazda.licensePlateNumber = "ABC123";
         cars.add(mazda);
 
         Car ford = new Car();
-        ford.id = 2L;
+        ford.id = ids.incrementAndGet();
         ford.manufacturer = "Ford";
         ford.model = "Mustang";
         ford.licensePlateNumber = "XYZ987";

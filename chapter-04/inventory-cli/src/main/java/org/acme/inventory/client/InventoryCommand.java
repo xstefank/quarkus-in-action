@@ -14,15 +14,14 @@ public class InventoryCommand
 
     private static final String USAGE =
         "Usage: inventory <add>|<remove> " +
-            "<license plate number> (<manufacturer> <model>)";
+            "<license plate number> <manufacturer> <model>";
 
     @GrpcClient("inventory")
     InventoryService inventory;
 
     @Override
     public int run(String... args) {
-        String action =
-        args.length > 0 ? args[0] : null;
+        String action = args.length > 0 ? args[0] : null;
         if ("add".equals(action) && args.length >= 4) {
             add(args[1], args[2], args[3]);
             return 0;
