@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,6 +32,9 @@ public class ReservationResource {
     private final InventoryClient inventoryClient;
     private final RentalClient rentalClient;
 
+    @Inject
+    javax.ws.rs.core.SecurityContext context;
+
     public ReservationResource(ReservationsRepository reservations,
                                @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient,
                                @RestClient RentalClient rentalClient) {
@@ -41,13 +46,25 @@ public class ReservationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Reservation make(Reservation reservation) {
-        Reservation result = reservationsRepository.save(reservation);
-        // this is just a dummy value for the time being
-        String userId = "x";
+        reservation.userId = context.getUserPrincipal() != null ?
+            context.getUserPrincipal().getName() : null;
+            Reservation result = reservationsRepository.save(reservation);
         if (reservation.startDay.equals(LocalDate.now())) {
-            rentalClient.start(userId, result.id);
+            rentalClient.start(reservation.userId, result.id);
         }
         return result;
+    }
+
+    @GET
+    @Path("all")
+    public Collection<Reservation> allReservations() {
+        String userId = context.getUserPrincipal() != null ?
+            context.getUserPrincipal().getName() : null;
+        return reservationsRepository.findAll()
+            .stream()
+            .filter(reservation -> userId == null ||
+                userId.equals(reservation.userId))
+        .collect(Collectors.toList());
     }
 
     @GET
