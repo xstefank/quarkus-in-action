@@ -1,10 +1,13 @@
-package org.acme.reservation.reservation;
+package org.acme.reservation.entity;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+import javax.persistence.Entity;
 import java.time.LocalDate;
 
-public class Reservation {
+@Entity
+public class Reservation extends PanacheEntity {
 
-    public Long id;
     public String userId;
     public Long carId;
     public LocalDate startDay;
@@ -18,5 +21,15 @@ public class Reservation {
     public boolean isReserved(LocalDate startDay, LocalDate endDay) {
         return (!(this.endDay.isBefore(startDay) ||
             this.startDay.isAfter(endDay)));
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+            "id=" + id +
+            ", carId=" + carId +
+            ", startDay=" + startDay +
+            ", endDay=" + endDay +
+            '}';
     }
 }

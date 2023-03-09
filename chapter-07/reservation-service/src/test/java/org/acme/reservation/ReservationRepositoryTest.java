@@ -1,7 +1,7 @@
 package org.acme.reservation;
 
 import io.quarkus.test.junit.QuarkusTest;
-import org.acme.reservation.reservation.Reservation;
+import org.acme.reservation.entity.Reservation;
 import org.acme.reservation.reservation.ReservationsRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
