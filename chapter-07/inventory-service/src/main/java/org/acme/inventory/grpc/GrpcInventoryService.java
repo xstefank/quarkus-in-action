@@ -2,16 +2,18 @@ package org.acme.inventory.grpc;
 
 import io.quarkus.grpc.GrpcService;
 import io.quarkus.logging.Log;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.acme.inventory.database.CarInventory;
 import org.acme.inventory.model.Car;
 import org.acme.inventory.model.CarResponse;
 import org.acme.inventory.model.InsertCarRequest;
 import org.acme.inventory.model.InventoryService;
 import org.acme.inventory.model.RemoveCarRequest;
+import org.acme.inventory.repository.CarRepository;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @GrpcService
@@ -19,22 +21,22 @@ public class GrpcInventoryService
     implements InventoryService {
 
     @Inject
-    CarInventory inventory;
+    CarRepository carRepository;
 
     @Override
-    public Multi<CarResponse>
-    add(Multi<InsertCarRequest> requests) {
+    @Blocking
+    @Transactional
+    public Multi<CarResponse> add(Multi<InsertCarRequest> requests) {
         return requests
             .map(request -> {
                 Car car = new Car();
                 car.licensePlateNumber = request.getLicensePlateNumber();
                 car.manufacturer = request.getManufacturer();
                 car.model = request.getModel();
-                car.id = CarInventory.ids.incrementAndGet();
                 return car;
             }).onItem().invoke(car -> {
                 Log.info("Persisting " + car);
-                inventory.getCars().add(car);
+                carRepository.persist(car);
             }).map(car -> CarResponse.newBuilder()
                 .setLicensePlateNumber(car.licensePlateNumber)
                 .setManufacturer(car.manufacturer)
@@ -45,16 +47,16 @@ public class GrpcInventoryService
 
 
     @Override
-    public Uni<CarResponse> remove(
-        RemoveCarRequest request) {
-        Optional<Car> optionalCar = inventory.getCars().stream()
-        .filter(car -> request.getLicensePlateNumber()
-            .equals(car.licensePlateNumber))
-        .findFirst();
+    @Blocking
+    @Transactional
+    public Uni<CarResponse> remove(RemoveCarRequest request) {
+        Optional<Car> optionalCar = carRepository
+            .findByLicensePlateNumberOptional(
+                request.getLicensePlateNumber());
 
         if (optionalCar.isPresent()) {
             Car removedCar = optionalCar.get();
-            inventory.getCars().remove(removedCar);
+            carRepository.delete(removedCar);
             return Uni.createFrom().item(CarResponse.newBuilder()
                 .setLicensePlateNumber(removedCar.licensePlateNumber)
                 .setManufacturer(removedCar.manufacturer)
