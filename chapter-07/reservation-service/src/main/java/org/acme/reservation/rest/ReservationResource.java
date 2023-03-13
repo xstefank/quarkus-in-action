@@ -14,6 +14,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 
 import io.quarkus.logging.Log;
 import io.smallrye.graphql.client.GraphQLClient;
@@ -34,7 +35,7 @@ public class ReservationResource {
     private final RentalClient rentalClient;
 
     @Inject
-    javax.ws.rs.core.SecurityContext context;
+    SecurityContext context;
 
     public ReservationResource(
                                @GraphQLClient("inventory")
@@ -46,15 +47,15 @@ public class ReservationResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    @Transactional // <1>
+    @Transactional
     public Reservation make(Reservation reservation) {
         reservation.userId = context.getUserPrincipal() != null ?
             context.getUserPrincipal().getName() : null;
-        reservation.persist(); // <2>
+        reservation.persist();
         Log.info("Successfully reserved reservation " + reservation);
         if (reservation.startDay.equals(LocalDate.now())) {
             Rental rental = rentalClient
-                .start(reservation.userId, reservation.id);// <3>
+                .start(reservation.userId, reservation.id);
             Log.info("Successfully started rental " + rental);
         }
         return reservation;
