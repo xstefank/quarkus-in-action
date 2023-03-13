@@ -1,6 +1,7 @@
 package org.acme.rental;
 
 import io.quarkus.logging.Log;
+import org.acme.rental.entity.Rental;
 
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
