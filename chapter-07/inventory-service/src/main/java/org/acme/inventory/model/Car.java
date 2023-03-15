@@ -10,10 +10,10 @@ public class Car {
 
     @Id
     @GeneratedValue
-    public Long id;
-    public String licensePlateNumber;
-    public String manufacturer;
-    public String model;
+    private Long id;
+    private String licensePlateNumber;
+    private String manufacturer;
+    private String model;
 
     public Long getId() {
         return id;

@@ -30,21 +30,20 @@ public class GrpcInventoryService
         return requests
             .map(request -> {
                 Car car = new Car();
-                car.licensePlateNumber = request.getLicensePlateNumber();
-                car.manufacturer = request.getManufacturer();
-                car.model = request.getModel();
+                car.setLicensePlateNumber(request.getLicensePlateNumber());
+                car.setManufacturer(request.getManufacturer());
+                car.setModel(request.getModel());
                 return car;
             }).onItem().invoke(car -> {
                 Log.info("Persisting " + car);
                 carRepository.persist(car);
             }).map(car -> CarResponse.newBuilder()
-                .setLicensePlateNumber(car.licensePlateNumber)
-                .setManufacturer(car.manufacturer)
-                .setModel(car.model)
-                .setId(car.id)
+                .setLicensePlateNumber(car.getLicensePlateNumber())
+                .setManufacturer(car.getManufacturer())
+                .setModel(car.getModel())
+                .setId(car.getId())
                 .build());
     }
-
 
     @Override
     @Blocking
@@ -58,10 +57,10 @@ public class GrpcInventoryService
             Car removedCar = optionalCar.get();
             carRepository.delete(removedCar);
             return Uni.createFrom().item(CarResponse.newBuilder()
-                .setLicensePlateNumber(removedCar.licensePlateNumber)
-                .setManufacturer(removedCar.manufacturer)
-                .setModel(removedCar.model)
-                .setId(removedCar.id)
+                .setLicensePlateNumber(removedCar.getLicensePlateNumber())
+                .setManufacturer(removedCar.getManufacturer())
+                .setModel(removedCar.getModel())
+                .setId(removedCar.getId())
                 .build());
         }
         return Uni.createFrom().nullItem();
