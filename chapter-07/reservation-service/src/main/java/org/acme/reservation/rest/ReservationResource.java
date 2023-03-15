@@ -16,8 +16,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
+import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.quarkus.logging.Log;
 import io.smallrye.graphql.client.GraphQLClient;
+import io.smallrye.mutiny.Uni;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
@@ -47,29 +49,34 @@ public class ReservationResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    @Transactional
-    public Reservation make(Reservation reservation) {
+    @ReactiveTransactional
+    public Uni<Reservation> make(Reservation reservation) {
         reservation.userId = context.getUserPrincipal() != null ?
-            context.getUserPrincipal().getName() : null;
-        reservation.persist();
-        Log.info("Successfully reserved reservation " + reservation);
-        if (reservation.startDay.equals(LocalDate.now())) {
-            Rental rental = rentalClient
-                .start(reservation.userId, reservation.id);
-            Log.info("Successfully started rental " + rental);
-        }
-        return reservation;
+            context.getUserPrincipal().getName() : "anonymous";
+        return reservation.<Reservation>persist().onItem()
+            .call(persistedReservation -> {
+                Log.info("Successfully reserved reservation " + persistedReservation);
+                if (persistedReservation.startDay.equals(LocalDate.now())) {
+                    return rentalClient.start(persistedReservation.userId,
+                            persistedReservation.id)
+                        .onItem().invoke(rental ->
+                            Log.info("Successfully started rental " + rental))
+                        .replaceWith(persistedReservation);
+
+                }
+                return Uni.createFrom().item(persistedReservation);
+            });
     }
 
     @GET
     @Path("all")
-    public Collection<Reservation> allReservations() {
+    public Uni<List<Reservation>> allReservations() {
         String userId = context.getUserPrincipal() != null ?
             context.getUserPrincipal().getName() : null;
         return Reservation.<Reservation>streamAll()
             .filter(reservation -> userId == null ||
                 userId.equals(reservation.userId))
-        .collect(Collectors.toList());
+            .collect().asList();
     }
 
     @GET
@@ -85,7 +92,10 @@ public class ReservationResource {
         }
 
         // get all current reservations
-        List<Reservation> reservations = Reservation.listAll();
+        // not the intended way with reactive types,
+        // we block here for simplicity
+        List<Reservation> reservations = Reservation.<Reservation>listAll()
+            .await().indefinitely();
         // for each reservation, remove the car from the map
         for (Reservation reservation : reservations) {
             if (reservation.isReserved(startDate, endDate)) {

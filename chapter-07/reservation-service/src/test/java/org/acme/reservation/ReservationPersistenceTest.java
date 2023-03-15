@@ -22,8 +22,8 @@ public class ReservationPersistenceTest {
         reservation.persist();
 
         Assertions.assertNotNull(reservation.id);
-        Assertions.assertEquals(1, Reservation.count());
-        Reservation persistedReservation = Reservation.findById(reservation.id);
+        Assertions.assertEquals(1, Reservation.count().await().indefinitely());
+        Reservation persistedReservation = Reservation.<Reservation>findById(reservation.id).await().indefinitely();
         Assertions.assertNotNull(persistedReservation);
         Assertions.assertEquals(reservation.carId, persistedReservation.carId);
     }

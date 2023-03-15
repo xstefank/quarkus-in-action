@@ -3,6 +3,7 @@ package org.acme.reservation.rental;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.reactive.RestPath;
 
@@ -12,6 +13,6 @@ public interface RentalClient {
 
     @POST
     @Path("/start/{userId}/{reservationId}")
-    Rental start(@RestPath String userId,
-                 @RestPath Long reservationId);
+    Uni<Rental> start(@RestPath String userId,
+                      @RestPath Long reservationId);
 }
