@@ -47,8 +47,8 @@ public class ReservationResource {
     @POST
     public Reservation make(Reservation reservation) {
         reservation.userId = context.getUserPrincipal() != null ?
-            context.getUserPrincipal().getName() : null;
-            Reservation result = reservationsRepository.save(reservation);
+                context.getUserPrincipal().getName() : "anonymous";
+        Reservation result = reservationsRepository.save(reservation);
         if (reservation.startDay.equals(LocalDate.now())) {
             rentalClient.start(reservation.userId, result.id);
         }
