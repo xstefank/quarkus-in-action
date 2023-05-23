@@ -2,6 +2,7 @@ package org.acme.inventory.grpc;
 
 import io.quarkus.grpc.GrpcService;
 import io.quarkus.logging.Log;
+import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -25,7 +26,6 @@ public class GrpcInventoryService
 
     @Override
     @Blocking
-    @Transactional
     public Multi<CarResponse> add(Multi<InsertCarRequest> requests) {
         return requests
             .map(request -> {
@@ -36,7 +36,7 @@ public class GrpcInventoryService
                 return car;
             }).onItem().invoke(car -> {
                 Log.info("Persisting " + car);
-                carRepository.persist(car);
+                QuarkusTransaction.run(() ->  carRepository.persist(car));
             }).map(car -> CarResponse.newBuilder()
                 .setLicensePlateNumber(car.getLicensePlateNumber())
                 .setManufacturer(car.getManufacturer())
