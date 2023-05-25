@@ -19,8 +19,6 @@ import javax.ws.rs.core.MediaType;
 @Path("/rental")
 public class RentalResource {
 
-    private final AtomicLong id = new AtomicLong(0);
-
     @Path("/start/{userId}/{reservationId}")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
