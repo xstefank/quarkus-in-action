@@ -19,7 +19,7 @@ public class ReservationPersistenceTest {
         reservation.startDay = LocalDate.now().plus(5, ChronoUnit.DAYS);
         reservation.endDay = LocalDate.now().plus(12, ChronoUnit.DAYS);
         reservation.carId = 384L;
-        reservation.persist();
+        reservation.persist().await().indefinitely();
 
         Assertions.assertNotNull(reservation.id);
         Assertions.assertEquals(1, Reservation.count().await().indefinitely());
