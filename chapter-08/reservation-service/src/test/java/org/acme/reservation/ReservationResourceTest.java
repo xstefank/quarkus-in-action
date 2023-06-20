@@ -7,6 +7,7 @@ import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.smallrye.mutiny.Uni;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.entity.Reservation;
@@ -40,7 +41,7 @@ public class ReservationResourceTest {
             Mockito.mock(GraphQLInventoryClient.class);
         Car peugeot = new Car(1L, "ABC 123", "Peugeot", "406");
         Mockito.when(mock.allCars())
-            .thenReturn(Collections.singletonList(peugeot));
+            .thenReturn(Uni.createFrom().item(Collections.singletonList(peugeot)));
         QuarkusMock.installMockForType(mock,
             GraphQLInventoryClient.class);
     }

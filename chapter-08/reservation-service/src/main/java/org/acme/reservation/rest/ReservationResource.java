@@ -78,27 +78,33 @@ public class ReservationResource {
 
     @GET
     @Path("availability")
-    public Collection<Car> availability(@RestQuery LocalDate startDate,
+    public Uni<Collection<Car>> availability(@RestQuery LocalDate startDate,
                                         @RestQuery LocalDate endDate) {
-        // obtain all cars from inventory
-        List<Car> availableCars = inventoryClient.allCars();
-        // create a map from id to car
-        Map<Long, Car> carsById = new HashMap<>();
-        for (Car car : availableCars) {
-            carsById.put(car.id, car);
-        }
-
-        // get all current reservations
-        // not the intended way with reactive types,
-        // we block here for simplicity
-        List<Reservation> reservations = Reservation.<Reservation>listAll()
-            .await().indefinitely();
-        // for each reservation, remove the car from the map
-        for (Reservation reservation : reservations) {
-            if (reservation.isReserved(startDate, endDate)) {
-                carsById.remove(reservation.carId);
+        Uni<Map<Long, Car>> carsUni = inventoryClient.allCars().chain(cars -> {
+            // create a map from id to car
+            Map<Long, Car> carsById = new HashMap<>();
+            for (Car car : cars) {
+                carsById.put(car.id, car);
             }
-        }
-        return carsById.values();
+            return Uni.createFrom().item(carsById);
+        });
+
+        Uni<List<Reservation>> reservationsUni = Reservation.listAll();
+
+        return Uni.combine().all()
+            .unis(carsUni, reservationsUni)
+            .asTuple()
+            .chain(tuple -> {
+                Map<Long, Car> carsById = tuple.getItem1();
+                List<Reservation> reservations = tuple.getItem2();
+
+                // for each reservation, remove the car from the map
+                for (Reservation reservation : reservations) {
+                    if (reservation.isReserved(startDate, endDate)) {
+                        carsById.remove(reservation.carId);
+                    }
+                }
+                return Uni.createFrom().item(carsById.values());
+            });
     }
 }
