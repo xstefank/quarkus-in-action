@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -80,14 +82,9 @@ public class ReservationResource {
     @Path("availability")
     public Uni<Collection<Car>> availability(@RestQuery LocalDate startDate,
                                         @RestQuery LocalDate endDate) {
-        Uni<Map<Long, Car>> carsUni = inventoryClient.allCars().chain(cars -> {
-            // create a map from id to car
-            Map<Long, Car> carsById = new HashMap<>();
-            for (Car car : cars) {
-                carsById.put(car.id, car);
-            }
-            return Uni.createFrom().item(carsById);
-        });
+        Uni<Map<Long, Car>> carsUni = inventoryClient.allCars()
+            .map(cars -> cars.stream().collect(Collectors
+                .toMap(car -> car.id, Function.identity())));
 
         Uni<List<Reservation>> reservationsUni = Reservation.listAll();
 
