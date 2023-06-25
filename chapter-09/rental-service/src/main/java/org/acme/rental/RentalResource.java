@@ -16,10 +16,8 @@ import org.acme.rental.reservation.Reservation;
 import org.acme.rental.reservation.ReservationClient;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -27,8 +25,8 @@ import java.util.List;
 @Path("/rental")
 public class RentalResource {
 
-    private static final double STANDARD_REFUND_RATE_PER_DAY = -10.99;
-    private static final double STANDARD_PRICE_FOR_PROLONGED_DAY = 25.99;
+    public static final double STANDARD_REFUND_RATE_PER_DAY = -10.99;
+    public static final double STANDARD_PRICE_FOR_PROLONGED_DAY = 25.99;
 
     @Inject
     @RestClient
@@ -40,7 +38,6 @@ public class RentalResource {
 
     @Path("/start/{userId}/{reservationId}")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Rental start(String userId,
                         Long reservationId) {
@@ -72,7 +69,6 @@ public class RentalResource {
             .getById(reservationId);
 
         LocalDate today = LocalDate.now();
-        System.out.println(!reservation.endDay.isEqual(today));
         if (!reservation.endDay.isEqual(today)) {
             adjustmentEmitter.send(new InvoiceAdjust(
                 rental, today, computePrice(reservation.endDay, today)));
@@ -91,11 +87,6 @@ public class RentalResource {
             ChronoUnit.DAYS.between(today, endDate)
                 * STANDARD_REFUND_RATE_PER_DAY;
     }
-
-//    @Incoming("invoice-adjust")
-//    public void consume(InvoiceAdjust invoiceAdjust) {
-//        System.out.println(invoiceAdjust);
-//    }
 
     @GET
     public List<Rental> list() {
