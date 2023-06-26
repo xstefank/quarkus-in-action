@@ -2,7 +2,7 @@ package org.acme.reservation.entity;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.time.LocalDate;
 
 @Entity
