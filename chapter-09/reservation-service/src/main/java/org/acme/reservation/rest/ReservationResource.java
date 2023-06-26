@@ -12,6 +12,7 @@ import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
 import org.acme.reservation.rental.RentalClient;
 import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestQuery;
 
@@ -25,6 +26,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -72,18 +74,19 @@ public class ReservationResource {
                 if (persistedReservation.startDay.equals(LocalDate.now())) {
                     return invoiceUni.chain(() ->
                         rentalClient.start(persistedReservation.userId,
-                            persistedReservation.id)
-                        .onItem().invoke(rental ->
-                            Log.info("Successfully started rental " + rental))
-                        .replaceWith(persistedReservation));
+                                persistedReservation.id)
+                            .onItem().invoke(rental ->
+                                Log.info("Successfully started rental " + rental))
+                            .replaceWith(persistedReservation));
                 }
-                return Uni.createFrom().item(persistedReservation);
+                return invoiceUni
+                    .replaceWith(persistedReservation);
             });
     }
 
     private double computePrice(Reservation reservation) {
-        return Duration.between(reservation.startDay.atStartOfDay(),
-            reservation.endDay.atStartOfDay()).toDays() * STANDARD_RATE_PER_DAY;
+        return (ChronoUnit.DAYS.between(reservation.startDay,
+            reservation.endDay) + 1) * STANDARD_RATE_PER_DAY;
     }
 
     @GET
