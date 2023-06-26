@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @QuarkusTest
@@ -27,7 +28,7 @@ public class ReservationPersistenceTest {
             }
         };
 
-        LongWrapper idWrapper = new LongWrapper();
+        AtomicReference<Long> idWrapper = new AtomicReference<>();
 
         asserter.execute(() -> Reservation.deleteAll());
         asserter.assertThat(() -> {
@@ -38,18 +39,14 @@ public class ReservationPersistenceTest {
             return reservation.<Reservation>persist();
         }, reservation -> {
             Assertions.assertNotNull(reservation.id);
-            idWrapper.value = reservation.id;
+            idWrapper.set(reservation.id);
         });
 
         asserter.assertEquals(() -> Reservation.count(), 1L);
-        asserter.assertThat(() -> Reservation.<Reservation>findById(idWrapper.value),
+        asserter.assertThat(() -> Reservation.<Reservation>findById(idWrapper.get()),
             reservation -> {
                 Assertions.assertNotNull(reservation);
                 Assertions.assertEquals(384L, reservation.carId);
             });
-    }
-
-    private static final class LongWrapper {
-        Long value;
     }
 }
