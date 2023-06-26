@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class ReservationResource {
 
-    private static final double STANDARD_RATE_PER_DAY = 19.99;
+    public static final double STANDARD_RATE_PER_DAY = 19.99;
 
     @Inject
     @Channel("invoices")

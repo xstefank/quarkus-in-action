@@ -27,19 +27,29 @@ public class ReservationPersistenceTest {
             }
         };
 
+        LongWrapper idWrapper = new LongWrapper();
+
+        asserter.execute(() -> Reservation.deleteAll());
         asserter.assertThat(() -> {
             Reservation reservation = new Reservation();
             reservation.startDay = LocalDate.now().plus(5, ChronoUnit.DAYS);
             reservation.endDay = LocalDate.now().plus(12, ChronoUnit.DAYS);
             reservation.carId = 384L;
             return reservation.<Reservation>persist();
-        }, reservation -> Assertions.assertNotNull(reservation.id));
+        }, reservation -> {
+            Assertions.assertNotNull(reservation.id);
+            idWrapper.value = reservation.id;
+        });
 
         asserter.assertEquals(() -> Reservation.count(), 1L);
-        asserter.assertThat(() -> Reservation.<Reservation>findById(1L),
+        asserter.assertThat(() -> Reservation.<Reservation>findById(idWrapper.value),
             reservation -> {
                 Assertions.assertNotNull(reservation);
                 Assertions.assertEquals(384L, reservation.carId);
             });
+    }
+
+    private static final class LongWrapper {
+        Long value;
     }
 }
