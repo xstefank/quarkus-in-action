@@ -28,9 +28,4 @@ public class PaymentRequester {
 
         return new InvoiceConfirmation(invoice, true);
     }
-
-    @Incoming("invoices-confirmations")
-    public void consume(InvoiceConfirmation invoiceConfirmation) {
-        System.out.println(invoiceConfirmation);
-    }
 }
