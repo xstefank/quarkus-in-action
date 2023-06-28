@@ -2,7 +2,6 @@ package org.acme.rental;
 
 import io.quarkus.logging.Log;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -34,7 +33,7 @@ public class RentalResource {
     ReservationClient reservationClient;
 
     @Inject
-    @Channel("invoice-adjust")
+    @Channel("invoices-adjust")
     Emitter<InvoiceAdjust> adjustmentEmitter;
 
     @Path("/start/{userId}/{reservationId}")
@@ -77,7 +76,7 @@ public class RentalResource {
             .orElseThrow(() -> new NotFoundException("Rental not found"));
 
         if (!rental.paid) {
-            throw new IllegalStateException("Rental is not paid: " + rental);
+            Log.warn("Rental is not paid: " + rental);
         }
 
         Reservation reservation = reservationClient
@@ -86,7 +85,8 @@ public class RentalResource {
         LocalDate today = LocalDate.now();
         if (!reservation.endDay.isEqual(today)) {
             adjustmentEmitter.send(new InvoiceAdjust(
-                rental, today, computePrice(reservation.endDay, today)));
+                rental.id.toString(), today,
+                computePrice(reservation.endDay, today)));
         }
 
         rental.endDate = LocalDate.now();

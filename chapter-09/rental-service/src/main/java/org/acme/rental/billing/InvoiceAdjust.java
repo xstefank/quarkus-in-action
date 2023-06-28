@@ -1,26 +1,25 @@
 package org.acme.rental.billing;
 
-import org.acme.rental.entity.Rental;
-
 import java.time.LocalDate;
 
 public class InvoiceAdjust {
 
-    public Rental rental;
+    public String rentalId;
     public LocalDate actualEndDate;
     public double price;
 
 
-    public InvoiceAdjust(Rental rental, LocalDate actualEndDate, double price) {
-        this.rental = rental;
+    public InvoiceAdjust(String rentalId, LocalDate actualEndDate,
+                         double price) {
+        this.rentalId = rentalId;
         this.actualEndDate = actualEndDate;
         this.price = price;
     }
 
     @Override
-    public String toString() {
+    public java.lang.String toString() {
         return "InvoiceAdjust{" +
-            "rental=" + rental +
+            "rentalId=" + rentalId +
             ", actualEndDate=" + actualEndDate +
             ", price=" + price +
             '}';

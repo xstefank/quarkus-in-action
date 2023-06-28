@@ -42,11 +42,7 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-hibernate-reactive-panache</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-reactive-pg-client</artifactId>
+      <artifactId>quarkus-mongodb-panache</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>

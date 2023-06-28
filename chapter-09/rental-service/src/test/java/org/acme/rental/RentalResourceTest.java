@@ -46,7 +46,7 @@ public class RentalResourceTest {
             .then()
             .statusCode(200);
 
-        // test that the Kafka message is sent to the invoice-adjust
+        // test that the Kafka message is sent to the invoices-adjust
         // Kafka topic
         given()
             .when().put("/rental/end/user123/1")
@@ -57,7 +57,7 @@ public class RentalResourceTest {
 
         // verify that the invoice was sent
         ConsumerTask<String, String> invoiceAdjust = kafkaCompanion
-            .consumeStrings().fromTopics("invoice-adjust", 1)
+            .consumeStrings().fromTopics("invoices-adjust", 1)
             .awaitNextRecord(Duration.ofSeconds(10));
 
             assertEquals(1, invoiceAdjust.count());

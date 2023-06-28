@@ -2,13 +2,10 @@ package org.acme.rental.invoice;
 
 import io.quarkus.logging.Log;
 import io.smallrye.common.annotation.Blocking;
-import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.acme.rental.entity.Rental;
 import org.acme.rental.invoice.data.InvoiceConfirmation;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-
-import java.time.LocalDate;
 
 @ApplicationScoped
 public class InvoiceConfirmationService {
@@ -24,14 +21,11 @@ public class InvoiceConfirmationService {
             // retry handling omitted
         }
 
-        // The details contain the Reservation object representation
-        JsonObject details = invoiceConfirmation.invoice.details;
+        InvoiceConfirmation.Reservation reservation =
+            invoiceConfirmation.invoice.reservation;
 
-        String userId = details.getString("userId");
-        Long reservationId = details.getLong("id");
-
-        Rental
-            .findByUserAndReservationIdsOptional(userId, reservationId)
+        Rental.findByUserAndReservationIdsOptional(
+            reservation.userId, reservation.id)
             .ifPresentOrElse(rental -> {
                 // mark the already started rental as paid
                 rental.paid = true;
@@ -39,10 +33,9 @@ public class InvoiceConfirmationService {
             }, () -> {
                 // create new rental starting in the future
                 Rental rental = new Rental();
-                rental.userId = userId;
-                rental.reservationId = reservationId;
-                rental.startDate = LocalDate.parse(
-                    details.getString("startDay"));
+                rental.userId = reservation.userId;
+                rental.reservationId = reservation.id;
+                rental.startDate = reservation.startDay;
                 rental.active = false;
                 rental.paid = true;
                 rental.persist();

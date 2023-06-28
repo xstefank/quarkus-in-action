@@ -1,35 +1,27 @@
 package org.acme.billing.model;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
-import io.vertx.core.json.JsonObject;
-import jakarta.persistence.Entity;
+import io.quarkus.mongodb.panache.PanacheMongoEntity;
+import org.acme.billing.data.Reservation;
 
-@Entity
-public class Invoice extends PanacheEntity {
+public class Invoice extends PanacheMongoEntity {
 
     public double totalPrice;
-    public InvoiceType type;
     public boolean paid;
+    public Reservation reservation;
 
-    public JsonObject details;
+    public Invoice() {
+    }
 
-    public Invoice() {}
-    
-    public Invoice(double totalPrice, InvoiceType type, boolean paid, JsonObject details) {
+    public Invoice(double totalPrice, boolean paid, Reservation reservation) {
         this.totalPrice = totalPrice;
-        this.type = type;
         this.paid = paid;
-        this.details = details;
+        this.reservation = reservation;
     }
 
     @Override
     public String toString() {
-        return "Invoice{" +
-            "totalPrice=" + totalPrice +
-            ", type=" + type +
-            ", paid=" + paid +
-            ", details=" + details +
-            ", id=" + id +
-            '}';
+        return ("Invoice{totalPrice=%s, paid=%s," +
+            " reservation=%s, id=%s}")
+            .formatted(totalPrice, paid, reservation, id);
     }
 }

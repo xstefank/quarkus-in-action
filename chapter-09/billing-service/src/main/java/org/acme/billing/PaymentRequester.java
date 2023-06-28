@@ -26,6 +26,7 @@ public class PaymentRequester {
         }
 
         invoice.paid = true;
+        invoice.update();
         Log.infof("Invoice %s is paid.", invoice);
 
         return new InvoiceConfirmation(invoice, true);

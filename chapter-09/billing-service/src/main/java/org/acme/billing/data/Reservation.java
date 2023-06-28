@@ -8,4 +8,10 @@ public class Reservation {
     public Long carId;
     public LocalDate startDay;
     public LocalDate endDay;
+
+    @Override
+    public String toString() {
+        return "Reservation{id=%d, userId='%s', carId=%d, startDay=%s, endDay=%s}"
+            .formatted(id, userId, carId, startDay, endDay);
+    }
 }
