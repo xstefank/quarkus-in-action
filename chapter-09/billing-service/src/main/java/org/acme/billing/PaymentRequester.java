@@ -1,5 +1,6 @@
 package org.acme.billing;
 
+import io.quarkus.logging.Log;
 import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.acme.billing.data.InvoiceConfirmation;
@@ -25,6 +26,7 @@ public class PaymentRequester {
         }
 
         invoice.paid = true;
+        Log.infof("Invoice %s is paid.", invoice);
 
         return new InvoiceConfirmation(invoice, true);
     }

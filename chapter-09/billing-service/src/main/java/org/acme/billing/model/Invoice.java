@@ -1,11 +1,8 @@
 package org.acme.billing.model;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
-import jakarta.persistence.ElementCollection;
+import io.vertx.core.json.JsonObject;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-
-import java.util.Map;
 
 @Entity
 public class Invoice extends PanacheEntity {
@@ -14,12 +11,11 @@ public class Invoice extends PanacheEntity {
     public InvoiceType type;
     public boolean paid;
 
-    @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
-    public Map<String, String> details;
+    public JsonObject details;
 
     public Invoice() {}
     
-    public Invoice(double totalPrice, InvoiceType type, boolean paid, Map<String, String> details) {
+    public Invoice(double totalPrice, InvoiceType type, boolean paid, JsonObject details) {
         this.totalPrice = totalPrice;
         this.type = type;
         this.paid = paid;

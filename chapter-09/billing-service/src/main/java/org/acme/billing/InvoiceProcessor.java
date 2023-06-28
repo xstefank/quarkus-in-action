@@ -1,6 +1,7 @@
 package org.acme.billing;
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,8 +13,6 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
-import java.util.Map;
-
 @ApplicationScoped
 public class InvoiceProcessor {
 
@@ -24,19 +23,11 @@ public class InvoiceProcessor {
         ReservationInvoiceMessage invoiceMessage = message.getPayload().mapTo(ReservationInvoiceMessage.class);
         Reservation reservation = invoiceMessage.reservation;
         Invoice invoice = new Invoice(invoiceMessage.price, InvoiceType.RESERVATION,
-            false, createDetails(reservation));
+            false, JsonObject.mapFrom(reservation));
+
+        Log.info("Processing invoice: " + invoice);
 
         return invoice.<Invoice>persist()
             .onItem().invoke(message::ack);
-    }
-
-    private Map<String, String> createDetails(Reservation reservation) {
-        return Map.of(
-            "Reservation ID", reservation.id.toString(),
-            "User", reservation.userId,
-            "Car ID", reservation.carId.toString(),
-            "Start date", reservation.startDay.toString(),
-            "End date", reservation.endDay.toString()
-        );
     }
 }

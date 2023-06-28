@@ -21,6 +21,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/rental")
 public class RentalResource {
@@ -42,16 +43,26 @@ public class RentalResource {
     public Rental start(String userId,
                         Long reservationId) {
         Log.infof("Starting rental for %s with reservation %s",
-        userId, reservationId);
+            userId, reservationId);
 
-        Rental rental = new Rental();
-        rental.userId = userId;
-        rental.reservationId = reservationId;
-        rental.startDate = LocalDate.now();
-        rental.active = true;
+        Optional<Rental> rentalOptional = Rental
+            .findByUserAndReservationIdsOptional(userId, reservationId);
 
-        rental.persist();
-
+        Rental rental;
+        if (rentalOptional.isPresent()) {
+            // received confirmed invoice before
+            rental = rentalOptional.get();
+            rental.active = true;
+            rental.update();
+        } else {
+            // rental starting right now before payment
+            rental = new Rental();
+            rental.userId = userId;
+            rental.reservationId = reservationId;
+            rental.startDate = LocalDate.now();
+            rental.active = true;
+            rental.persist();
+        }
         return rental;
     }
 
@@ -64,6 +75,10 @@ public class RentalResource {
         Rental rental = Rental
             .findByUserAndReservationIdsOptional(userId, reservationId)
             .orElseThrow(() -> new NotFoundException("Rental not found"));
+
+        if (!rental.paid) {
+            throw new IllegalStateException("Rental is not paid: " + rental);
+        }
 
         Reservation reservation = reservationClient
             .getById(reservationId);
