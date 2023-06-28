@@ -85,7 +85,7 @@ public class RentalResource {
         LocalDate today = LocalDate.now();
         if (!reservation.endDay.isEqual(today)) {
             adjustmentEmitter.send(new InvoiceAdjust(
-                rental.id.toString(), today,
+                rental.id.toString(), userId, today,
                 computePrice(reservation.endDay, today)));
         }
 
