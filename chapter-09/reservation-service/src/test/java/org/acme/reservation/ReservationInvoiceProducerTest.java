@@ -8,6 +8,7 @@ import org.acme.reservation.billing.Invoice;
 import org.acme.reservation.entity.Reservation;
 import org.awaitility.Awaitility;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,11 @@ public class ReservationInvoiceProducerTest {
         System.out.println("Received invoice " + invoice);
 
         receivedInvoices.put(ids.incrementAndGet(), invoice);
+    }
+
+    @AfterEach
+    public void cleanup() {
+        Reservation.deleteAll().await().indefinitely();
     }
 
     @Test
