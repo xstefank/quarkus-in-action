@@ -4,7 +4,6 @@ import io.quarkus.test.Mock;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.InventoryClient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mock

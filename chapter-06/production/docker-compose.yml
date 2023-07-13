@@ -13,10 +13,10 @@ services:
 
   keycloak:
     container_name: keycloak
-    image: quay.io/keycloak/keycloak:20.0.5
+    image: quay.io/keycloak/keycloak:21.0.2
     user: "${UID}"
     volumes:
-      - "./car-rental.json:/opt/keycloak/data/import/car-rental.json"
+      - "./car-rental.json:/opt/keycloak/data/import/car-rental.json:Z"
     command:
       - start-dev
       - --import-realm
