@@ -6,7 +6,7 @@ import org.acme.reservation.reservation.ReservationsRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
