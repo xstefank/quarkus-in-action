@@ -11,7 +11,6 @@ import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.reservation.Reservation;
 import org.acme.reservation.rest.ReservationResource;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -34,8 +33,11 @@ public class ReservationResourceTest {
     @TestHTTPResource("availability")
     URL availability;
 
-    @BeforeAll
-    public static void setup() {
+    // uses mocks
+    @DisabledOnIntegrationTest(forArtifactTypes =
+            DisabledOnIntegrationTest.ArtifactType.NATIVE_BINARY)
+    @Test
+    public void testMakingAReservationAndCheckAvailability() {
         GraphQLInventoryClient mock =
             Mockito.mock(GraphQLInventoryClient.class);
         Car peugeot = new Car(1L, "ABC 123", "Peugeot", "406");
@@ -43,13 +45,7 @@ public class ReservationResourceTest {
             .thenReturn(Collections.singletonList(peugeot));
         QuarkusMock.installMockForType(mock,
             GraphQLInventoryClient.class);
-    }
 
-    // uses mocks
-    @DisabledOnIntegrationTest(forArtifactTypes =
-        DisabledOnIntegrationTest.ArtifactType.NATIVE_BINARY)
-    @Test
-    public void testMakingAReservationAndCheckAvailability() {
         String startDate = "2022-01-01";
         String endDate = "2022-01-10";
         // Get the list of available cars for our requested timeslot
