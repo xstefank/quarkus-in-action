@@ -7,16 +7,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.SecurityContext;
 
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+
 import io.quarkus.logging.Log;
 import io.smallrye.graphql.client.GraphQLClient;
 import io.smallrye.mutiny.Uni;
@@ -48,7 +49,7 @@ public class ReservationResource {
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    @ReactiveTransactional
+    @WithTransaction
     public Uni<Reservation> make(Reservation reservation) {
         reservation.userId = context.getUserPrincipal() != null ?
             context.getUserPrincipal().getName() : "anonymous";
@@ -72,10 +73,11 @@ public class ReservationResource {
     public Uni<List<Reservation>> allReservations() {
         String userId = context.getUserPrincipal() != null ?
             context.getUserPrincipal().getName() : null;
-        return Reservation.<Reservation>streamAll()
-            .filter(reservation -> userId == null ||
-                userId.equals(reservation.userId))
-            .collect().asList();
+        return Reservation.<Reservation>listAll()
+            .onItem().transform(reservations -> reservations.stream()
+                .filter(reservation -> userId == null ||
+                    userId.equals(reservation.userId))
+                .collect(Collectors.toList()));
     }
 
     @GET

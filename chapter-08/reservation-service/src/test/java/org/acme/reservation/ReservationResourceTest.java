@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -43,7 +44,7 @@ public class ReservationResourceTest {
                 Mockito.mock(GraphQLInventoryClient.class);
         Car peugeot = new Car(1L, "ABC 123", "Peugeot", "406");
         Mockito.when(mock.allCars())
-                .thenReturn(Uni.createFrom().item(Collections.singletonList(peugeot)));
+                .thenReturn(Uni.createFrom().item(List.of(peugeot)));
         QuarkusMock.installMockForType(mock,
                 GraphQLInventoryClient.class);
 
