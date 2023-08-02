@@ -1,30 +1,31 @@
 package org.acme.reservation.rest;
 
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.logging.Log;
+import io.smallrye.graphql.client.GraphQLClient;
+import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+import org.acme.reservation.entity.Reservation;
+import org.acme.reservation.inventory.Car;
+import org.acme.reservation.inventory.GraphQLInventoryClient;
+import org.acme.reservation.inventory.InventoryClient;
+import org.acme.reservation.rental.RentalClient;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.reactive.RestQuery;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.SecurityContext;
-
-import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
-import io.quarkus.logging.Log;
-import io.smallrye.graphql.client.GraphQLClient;
-import io.smallrye.mutiny.Uni;
-import org.acme.reservation.inventory.Car;
-import org.acme.reservation.inventory.GraphQLInventoryClient;
-import org.acme.reservation.inventory.InventoryClient;
-import org.acme.reservation.rental.RentalClient;
-import org.acme.reservation.entity.Reservation;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.resteasy.reactive.RestQuery;
+import java.util.stream.Collectors;
 
 @Path("reservation")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,16 +38,16 @@ public class ReservationResource {
     SecurityContext context;
 
     public ReservationResource(
-                               @GraphQLClient("inventory")
-                               GraphQLInventoryClient inventoryClient,
-                               @RestClient RentalClient rentalClient) {
+        @GraphQLClient("inventory")
+        GraphQLInventoryClient inventoryClient,
+        @RestClient RentalClient rentalClient) {
         this.inventoryClient = inventoryClient;
         this.rentalClient = rentalClient;
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    @ReactiveTransactional
+    @WithTransaction
     public Uni<Reservation> make(Reservation reservation) {
         reservation.userId = context.getUserPrincipal() != null ?
             context.getUserPrincipal().getName() : "anonymous";
@@ -70,16 +71,17 @@ public class ReservationResource {
     public Uni<List<Reservation>> allReservations() {
         String userId = context.getUserPrincipal() != null ?
             context.getUserPrincipal().getName() : null;
-        return Reservation.<Reservation>streamAll()
-            .filter(reservation -> userId == null ||
-                userId.equals(reservation.userId))
-            .collect().asList();
+        return Reservation.<Reservation>listAll()
+            .onItem().transform(reservations -> reservations.stream()
+                .filter(reservation -> userId == null ||
+                    userId.equals(reservation.userId))
+                .collect(Collectors.toList()));
     }
 
     @GET
     @Path("availability")
-    public Collection<Car> availability(@RestQuery LocalDate startDate,
-                                        @RestQuery LocalDate endDate) {
+    public Uni<Collection<Car>> availability(@RestQuery LocalDate startDate,
+                                             @RestQuery LocalDate endDate) {
         // obtain all cars from inventory
         List<Car> availableCars = inventoryClient.allCars();
         // create a map from id to car
@@ -89,16 +91,15 @@ public class ReservationResource {
         }
 
         // get all current reservations
-        // not the intended way with reactive types,
-        // we block here for simplicity
-        List<Reservation> reservations = Reservation.<Reservation>listAll()
-            .await().indefinitely();
-        // for each reservation, remove the car from the map
-        for (Reservation reservation : reservations) {
-            if (reservation.isReserved(startDate, endDate)) {
-                carsById.remove(reservation.carId);
-            }
-        }
-        return carsById.values();
+        return Reservation.<Reservation>listAll()
+            .onItem().transform(reservations -> {
+                // for each reservation, remove the car from the map
+                for (Reservation reservation : reservations) {
+                    if (reservation.isReserved(startDate, endDate)) {
+                        carsById.remove(reservation.carId);
+                    }
+                }
+                return carsById.values();
+            });
     }
 }

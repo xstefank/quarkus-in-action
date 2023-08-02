@@ -12,7 +12,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.16.0.Final</quarkus.platform.version>
+    <quarkus.platform.version>3.2.0.Final</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
   </properties>
@@ -77,6 +77,12 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5-mockito</artifactId>
+      <scope>test</scope>
+    </dependency>
+<!-- TODO quarkus-test-hibernate-reactive-panache for TransactionalUniAsserter-->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-test-vertx</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

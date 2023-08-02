@@ -13,8 +13,8 @@ import org.acme.inventory.model.InventoryService;
 import org.acme.inventory.model.RemoveCarRequest;
 import org.acme.inventory.repository.CarRepository;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @GrpcService
