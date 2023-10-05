@@ -39,28 +39,24 @@ public class RentalResourceTest {
         QuarkusMock.installMockForType(mock, ReservationClient.class,
             RestClient.LITERAL);
 
-
         // start new Rental for reservation with id 1
         given()
             .when().post("/rental/start/user123/1")
-            .then()
-            .statusCode(200);
+            .then().statusCode(200);
 
-        // test that the Kafka message is sent to the invoices-adjust
-        // Kafka topic
+        // end the with one prolonged day
         given()
             .when().put("/rental/end/user123/1")
-            .then()
-            .statusCode(200)
+            .then().statusCode(200)
             .body("active", is(false),
                 "endDate", is(LocalDate.now().toString()));
 
-        // verify that the invoice was sent
+        // verify that message is sent to the invoices-adjust Kafka topic
         ConsumerTask<String, String> invoiceAdjust = kafkaCompanion
             .consumeStrings().fromTopics("invoices-adjust", 1)
             .awaitNextRecord(Duration.ofSeconds(10));
 
-            assertEquals(1, invoiceAdjust.count());
+        assertEquals(1, invoiceAdjust.count());
         assertTrue(invoiceAdjust.getFirstRecord().value()
             .contains("\"price\":" +
                 RentalResource.STANDARD_PRICE_FOR_PROLONGED_DAY));
