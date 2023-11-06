@@ -15,7 +15,7 @@ public class InvoiceProcessor {
 
     @Incoming("invoices")
     @Outgoing("invoices-requests")
-    public Invoice processInvoice(Message<JsonObject> message) {
+    public Message<Invoice> processInvoice(Message<JsonObject> message) {
         ReservationInvoice invoiceMessage = message
             .getPayload().mapTo(ReservationInvoice.class);
         Reservation reservation = invoiceMessage.reservation;
@@ -25,7 +25,6 @@ public class InvoiceProcessor {
         invoice.persist();
         Log.info("Processing invoice: " + invoice);
 
-        message.ack();
-        return invoice;
+        return Message.of(invoice, message::ack);
     }
 }

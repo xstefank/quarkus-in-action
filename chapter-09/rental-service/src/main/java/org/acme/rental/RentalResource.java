@@ -77,6 +77,7 @@ public class RentalResource {
 
         if (!rental.paid) {
             Log.warn("Rental is not paid: " + rental);
+            // trigger error processing
         }
 
         Reservation reservation = reservationClient

@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public class Rental extends PanacheMongoEntity {
 
+    public boolean paid;
     public String userId;
     public Long reservationId;
     public LocalDate startDate;
     public LocalDate endDate;
     public boolean active;
 
-    public boolean paid;
 
     public static Optional<Rental> findByUserAndReservationIdsOptional(
         String userId, Long reservationId) {

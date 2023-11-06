@@ -25,8 +25,8 @@ public class InvoiceConfirmation {
     }
 
     public static final class Reservation {
-        public String userId;
         public Long id;
+        public String userId;
         public LocalDate startDay;
 
         @Override

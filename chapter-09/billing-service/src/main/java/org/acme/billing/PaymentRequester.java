@@ -30,6 +30,16 @@ public class PaymentRequester {
         return new InvoiceConfirmation(invoice, true);
     }
 
+    private void payment(String user, double price, Object data) {
+        Log.infof("Request for payment user: %s, price: %f, data: %s",
+            user, price, data);
+        try {
+            Thread.sleep(random.nextInt(1000, 5000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Incoming("invoices-adjust")
     @Blocking
     @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
@@ -40,15 +50,5 @@ public class PaymentRequester {
         invoiceAdjust.paid = true;
         invoiceAdjust.persist();
         Log.infof("Invoice adjustment %s is paid.", invoiceAdjust);
-    }
-
-    private void payment(String user, double price, Object data) {
-        Log.infof("Request for payment user: %s, price: %f, data: %s",
-            user, price, data);
-        try {
-            Thread.sleep(random.nextInt(1000, 5000));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

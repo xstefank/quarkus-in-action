@@ -34,7 +34,7 @@ public class ReservationInvoiceProducerTest {
     private final Map<Integer, Invoice> receivedInvoices = new HashMap<>();
     private final AtomicInteger ids = new AtomicInteger(0);
 
-    @Incoming("invoices-amqp")
+    @Incoming("invoices-rabbitmq")
     public void processInvoice(JsonObject json) {
         Invoice invoice = json.mapTo(Invoice.class);
         System.out.println("Received invoice " + invoice);
@@ -56,7 +56,7 @@ public class ReservationInvoiceProducerTest {
 
     @Test
     public void testInvoiceProduced() throws Throwable {
-        // Make reservation request that send the invoice to AMQP
+        // Make reservation request that send the invoice to RabbitMQ
         Reservation reservation = new Reservation();
         reservation.carId = 1L;
         reservation.startDay = LocalDate.now().plusDays(1);
