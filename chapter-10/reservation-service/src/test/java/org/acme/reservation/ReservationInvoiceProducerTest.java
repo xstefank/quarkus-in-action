@@ -1,6 +1,11 @@
 package org.acme.reservation;
 
+import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.vertx.RunOnVertxContext;
+import io.quarkus.test.vertx.UniAsserter;
+import io.quarkus.test.vertx.UniAsserterInterceptor;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.MediaType;
@@ -17,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static org.acme.reservation.rest.ReservationResource.STANDARD_RATE_PER_DAY;
@@ -28,7 +34,7 @@ public class ReservationInvoiceProducerTest {
     private final Map<Integer, Invoice> receivedInvoices = new HashMap<>();
     private final AtomicInteger ids = new AtomicInteger(0);
 
-    @Incoming("invoices-amqp")
+    @Incoming("invoices-rabbitmq")
     public void processInvoice(JsonObject json) {
         Invoice invoice = json.mapTo(Invoice.class);
         System.out.println("Received invoice " + invoice);
@@ -37,13 +43,20 @@ public class ReservationInvoiceProducerTest {
     }
 
     @AfterEach
-    public void cleanup() {
-        Reservation.deleteAll().await().indefinitely();
+    @RunOnVertxContext
+    public void cleanup(UniAsserter uniAsserter) {
+        final UniAsserter asserter = new UniAsserterInterceptor(uniAsserter) {
+            @Override
+            protected <T> Supplier<Uni<T>> transformUni(Supplier<Uni<T>> uniSupplier) {
+                return () -> Panache.withTransaction(uniSupplier);
+            }
+        };
+        asserter.execute(() -> Reservation.deleteAll());
     }
 
     @Test
     public void testInvoiceProduced() throws Throwable {
-        // Make reservation request that send the invoice to AMQP
+        // Make reservation request that send the invoice to RabbitMQ
         Reservation reservation = new Reservation();
         reservation.carId = 1L;
         reservation.startDay = LocalDate.now().plusDays(1);

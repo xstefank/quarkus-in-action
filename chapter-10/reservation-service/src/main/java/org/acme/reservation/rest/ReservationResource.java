@@ -136,5 +136,4 @@ public class ReservationResource {
                                                      LocalDate endDate) {
         return Uni.createFrom().item(List.of());
     }
-
 }
