@@ -2,7 +2,7 @@
 
 Este reposiório representa o código do livro desenvolvido no livro link:https://www.manning.com/books/quarkus-in-action[Quarkus in Action] atualmente se encontra no Programa de Acesso Antecipado da Manning (MEAP), com previsão de lançamento na primavera de 2024.
 
-Dísponível em: link:README.adoc[English] | link:README-pt.adoc[Português (Portuguese)]
+Dísponível em: link:README.adoc[Inglês] | link:README-pt.adoc[Português (Portuguese)]
 
 
 > Muito obrigado a cada contribuidor que fez isso acontecer (https://github.com/xstefank/quarkus-in-action/graphs/contributors).
