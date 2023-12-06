@@ -5,7 +5,7 @@ import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @Path("/admin/reservation")
-@RegisterRestClient(baseUri = "http://localhost:8081")
+@RegisterRestClient(configKey = "reservation")
 public interface ReservationClient {
 
     @GET

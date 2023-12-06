@@ -12,7 +12,7 @@ import jakarta.ws.rs.Path;
 import java.time.LocalDate;
 import java.util.Collection;
 
-@RegisterRestClient(baseUri = "http://localhost:8081")
+@RegisterRestClient(configKey = "reservations")
 @AccessToken
 @Path("reservation")
 public interface ReservationsClient {
