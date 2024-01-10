@@ -1,6 +1,51 @@
-version: '3.8'
+version: "3.9"
 
 services:
+  # Car Rental services
+  # Users service
+  users-service:
+    image: quay.io/quarkus-in-action/users-service:1.0.0
+    container_name: users-service
+    network_mode: host
+    depends_on:
+      - keycloak
+
+  # Reservation service
+  reservation-service:
+    image: quay.io/quarkus-in-action/reservation-service:1.0.0
+    container_name: reservation-service
+    network_mode: host
+    depends_on:
+      - keycloak
+      - postgres-reservation
+      - rabbitmq
+
+  # Rental service
+  rental-service:
+    image: quay.io/quarkus-in-action/rental-service:1.0.0
+    container_name: rental-service
+    network_mode: host
+    depends_on:
+      - kafka
+      - mongodb-rental
+
+  # Inventory service
+  inventory-service:
+    image: quay.io/quarkus-in-action/inventory-service:1.0.0
+    container_name: inventory-service
+    network_mode: host
+    restart: on-failure # only way I found that works
+
+#  # Billing service
+  billing-service:
+    image: quay.io/quarkus-in-action/billing-service:1.0.0
+    container_name: billing-service
+    network_mode: host
+    depends_on:
+      - kafka
+      - mongodb-billing
+      - rabbitmq
+
   # Keycloak
   postgres-keycloak:
     image: docker.io/library/postgres:14
@@ -99,7 +144,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      
+
   # MySQL
   mysql:
     image: mysql:8.0
