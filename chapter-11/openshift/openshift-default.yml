@@ -1,0 +1,190 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.openshift.io/vcs-url: <<unknown>>
+    app.quarkus.io/commit-id: 814c2a93f46b0c985ae4fd2c6339795651acf125
+    app.quarkus.io/build-timestamp: 2024-01-12 - 13:18:02 +0000
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8083"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8083
+    - name: grpc
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  type: ClusterIP
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  name: openjdk-17
+  namespace: default
+spec:
+  dockerImageRepository: registry.access.redhat.com/ubi8/openjdk-17
+  lookupPolicy:
+    local: true
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    app.openshift.io/vcs-url: <<unknown>>
+    app.quarkus.io/commit-id: 814c2a93f46b0c985ae4fd2c6339795651acf125
+    app.quarkus.io/build-timestamp: 2024-01-12 - 13:18:02 +0000
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+  namespace: default
+spec:
+  dockerImageRepository: quay.io/quarkus-in-action/inventory-service
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    app.openshift.io/vcs-url: <<unknown>>
+    app.quarkus.io/commit-id: 814c2a93f46b0c985ae4fd2c6339795651acf125
+    app.quarkus.io/build-timestamp: 2024-01-12 - 13:18:02 +0000
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+  namespace: default
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: inventory-service:1.0.0-SNAPSHOT
+  source:
+    binary: {}
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-17:1.17
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    app.openshift.io/vcs-url: <<unknown>>
+    app.quarkus.io/commit-id: 814c2a93f46b0c985ae4fd2c6339795651acf125
+    app.quarkus.io/build-timestamp: 2024-01-12 - 13:18:02 +0000
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8083"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/name: inventory-service
+  template:
+    metadata:
+      annotations:
+        app.openshift.io/vcs-url: <<unknown>>
+        app.quarkus.io/commit-id: 814c2a93f46b0c985ae4fd2c6339795651acf125
+        app.quarkus.io/build-timestamp: 2024-01-12 - 13:18:02 +0000
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8083"
+        prometheus.io/scheme: http
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/version: 1.0.0-SNAPSHOT
+        app.kubernetes.io/name: inventory-service
+      namespace: default
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: JAVA_APP_JAR
+              value: /deployments/quarkus-run.jar
+          image: quay.io/quarkus-in-action/inventory-service:1.0.0
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/live
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: inventory-service
+          ports:
+            - containerPort: 8083
+              name: http
+              protocol: TCP
+            - containerPort: 9000
+              name: grpc
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/ready
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          startupProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/started
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - inventory-service
+        from:
+          kind: ImageStreamTag
+          name: inventory-service:1.0.0
+      type: ImageChange
