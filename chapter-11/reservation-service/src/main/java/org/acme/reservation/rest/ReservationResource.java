@@ -1,5 +1,8 @@
 package org.acme.reservation.rest;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.smallrye.graphql.client.GraphQLClient;
@@ -58,6 +61,19 @@ public class ReservationResource {
         this.inventoryClient = inventoryClient;
         this.rentalClient = rentalClient;
     }
+
+    @Inject
+    OpenShiftClient openShiftClient;
+    
+    @GET
+    @Path("/pods")
+    public List<Pod> pods() {
+        return openShiftClient.pods().inNamespace("mstefank-dev")
+            .withField("status.phase", "Running").list().getItems();
+    }
+    
+    
+
 
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
