@@ -105,7 +105,7 @@ services:
     ports:
       - "27017:27017"
 
-  # MongoDB for Rental service
+  # MongoDB for Billing service
   mongodb-billing:
     image: mongo:4.4
     container_name: mongodb-billing

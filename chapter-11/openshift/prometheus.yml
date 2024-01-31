@@ -3,4 +3,4 @@ scrape_configs:
     scrape_interval: 10s
     metrics_path: '/q/metrics'
     static_configs:
-      - targets: ['inventory-service:8083']
+      - targets: ['inventory-service']

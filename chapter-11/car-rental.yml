@@ -1,3 +1,4 @@
+---
 # Keycloak
 kind: ConfigMap
 apiVersion: v1
@@ -3135,3 +3136,795 @@ spec:
   to:
     kind: Service
     name: jaeger
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: users-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  type: ClusterIP
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  name: openjdk-17
+spec:
+  dockerImageRepository: registry.access.redhat.com/ubi8/openjdk-17
+  lookupPolicy:
+    local: true
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: users-service
+spec:
+  dockerImageRepository: quay.io/quarkus-in-action/users-service
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: users-service
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: users-service:1.0.0-SNAPSHOT
+  source:
+    binary: {}
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-17:1.18
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: users-service
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/name: users-service
+        app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    spec:
+      initContainers:
+        - name: wait-for-grafana
+          image: darthcabs/tiny-tools:1
+          args:
+            - /bin/bash
+            - -c
+            - >
+              set -x;
+              while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://keycloak:8080)" != "200" ]]; do 
+                echo '.'
+                sleep 5;
+              done
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_OIDC_AUTH_SERVER_URL
+              value: http://keycloak-mstefank-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/realms/car-rental
+            - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://jaeger:4317
+            - name: QUARKUS_REST_CLIENT_RESERVATIONS_URL
+              value: http://reservation-service
+            - name: JAVA_APP_JAR
+              value: /deployments/quarkus-run.jar
+          image: quay.io/quarkus-in-action/users-service:1.0.0
+          imagePullPolicy: Always
+          name: users-service
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - users-service
+        from:
+          kind: ImageStreamTag
+          name: users-service:1.0.0
+      type: ImageChange
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/name: users-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: users-service
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: users-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: reservation-service
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  name: reservation-service-view
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: reservation-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: reservation-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  type: ClusterIP
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  name: openjdk-17
+spec:
+  dockerImageRepository: registry.access.redhat.com/ubi8/openjdk-17
+  lookupPolicy:
+    local: true
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: reservation-service
+spec:
+  dockerImageRepository: quay.io/quarkus-in-action/reservation-service
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: reservation-service
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: reservation-service:1.0.0-SNAPSHOT
+  source:
+    binary: {}
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-17:1.18
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: reservation-service
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/name: reservation-service
+        app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    spec:
+      initContainers:
+        - name: wait-for-grafana
+          image: darthcabs/tiny-tools:1
+          args:
+            - /bin/bash
+            - -c
+            - >
+              set -x;
+              while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://keycloak:8080)" != "200" ]]; do 
+                echo '.'
+                sleep 5;
+              done
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_OIDC_AUTH_SERVER_URL
+              value: http://keycloak-mstefank-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/realms/car-rental
+            - name: QUARKUS_SMALLRYE_GRAPHQL_CLIENT_INVENTORY_URL
+              value: http://inventory-service/graphql
+            - name: RABBITMQ_HOST
+              value: rabbitmq
+            - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://jaeger:4317
+            - name: QUARKUS_REST_CLIENT_RENTAL_URL
+              value: http://rental-service
+            - name: QUARKUS_DATASOURCE_REACTIVE_URL
+              value: vertx-reactive:postgresql://postgres-reservation:5432/quarkus
+            - name: JAVA_APP_JAR
+              value: /deployments/quarkus-run.jar
+          image: quay.io/quarkus-in-action/reservation-service:1.0.0
+          imagePullPolicy: Always
+          name: reservation-service
+          ports:
+            - containerPort: 8081
+              name: http
+              protocol: TCP
+      serviceAccountName: reservation-service
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reservation-service
+        from:
+          kind: ImageStreamTag
+          name: reservation-service:1.0.0
+      type: ImageChange
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/name: reservation-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: reservation-service
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: reservation-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: rental-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8082
+  selector:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  type: ClusterIP
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  name: openjdk-17
+spec:
+  dockerImageRepository: registry.access.redhat.com/ubi8/openjdk-17
+  lookupPolicy:
+    local: true
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: rental-service
+spec:
+  dockerImageRepository: quay.io/quarkus-in-action/rental-service
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: rental-service
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: rental-service:1.0.0-SNAPSHOT
+  source:
+    binary: {}
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-17:1.17
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: rental-service
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/name: rental-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/version: 1.0.0-SNAPSHOT
+        app.kubernetes.io/name: rental-service
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_REST_CLIENT_RESERVATION_URL
+              value: http://reservation-service
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: OUTSIDE://kafka:9092
+            - name: QUARKUS_MONGODB_CONNECTION_STRING
+              value: mongodb://mongodb-rental:27017
+            - name: JAVA_APP_JAR
+              value: /deployments/quarkus-run.jar
+          image: quay.io/quarkus-in-action/rental-service:1.0.0
+          imagePullPolicy: Always
+          name: rental-service
+          ports:
+            - containerPort: 8082
+              name: http
+              protocol: TCP
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - rental-service
+        from:
+          kind: ImageStreamTag
+          name: rental-service:1.0.0
+      type: ImageChange
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/name: rental-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: rental-service
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: rental-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8083"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+spec:
+  ports:
+    - name: grpc
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8083
+  selector:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  type: ClusterIP
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: openjdk-17
+spec:
+  dockerImageRepository: registry.access.redhat.com/ubi8/openjdk-17
+  lookupPolicy:
+    local: true
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+spec:
+  dockerImageRepository: quay.io/quarkus-in-action/inventory-service
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: inventory-service:1.0.0-SNAPSHOT
+  source:
+    binary: {}
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-17:1.17
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8083"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8083"
+        prometheus.io/scheme: http
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/name: inventory-service
+        app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://jaeger:4317
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:mysql://mysql:3306/quarkus
+            - name: JAVA_APP_JAR
+              value: /deployments/quarkus-run.jar
+          image: quay.io/quarkus-in-action/inventory-service:1.0.0
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/live
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: inventory-service
+          ports:
+            - containerPort: 9000
+              name: grpc
+              protocol: TCP
+            - containerPort: 8083
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/ready
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          startupProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/started
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - inventory-service
+        from:
+          kind: ImageStreamTag
+          name: inventory-service:1.0.0
+      type: ImageChange
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: inventory-service
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: inventory-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: billing-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8084
+  selector:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  type: ClusterIP
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  name: openjdk-17
+spec:
+  dockerImageRepository: registry.access.redhat.com/ubi8/openjdk-17
+  lookupPolicy:
+    local: true
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: billing-service
+spec:
+  dockerImageRepository: quay.io/quarkus-in-action/billing-service
+  lookupPolicy:
+    local: true
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: billing-service
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: billing-service:1.0.0-SNAPSHOT
+  source:
+    binary: {}
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-17:1.17
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: billing-service
+spec:
+  replicas: 1
+  selector:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+  template:
+    metadata:
+      annotations:
+        app.openshift.io/vcs-url: <<unknown>>
+        app.quarkus.io/commit-id: 50e17eda5e80f3a45f4ccdfaf20ce201e5b0c324
+        app.quarkus.io/build-timestamp: 2024-01-30 - 09:39:26 +0000
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/name: billing-service
+        app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: RABBITMQ_HOST
+              value: rabbitmq
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: OUTSIDE://kafka:9092
+            - name: QUARKUS_MONGODB_CONNECTION_STRING
+              value: mongodb://mongodb-billing:27017
+            - name: JAVA_APP_JAR
+              value: /deployments/quarkus-run.jar
+          image: quay.io/quarkus-in-action/billing-service:1.0.0
+          imagePullPolicy: Always
+          name: billing-service
+          ports:
+            - containerPort: 8084
+              name: http
+              protocol: TCP
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - billing-service
+        from:
+          kind: ImageStreamTag
+          name: billing-service:1.0.0
+      type: ImageChange
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: billing-service
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: billing-service
