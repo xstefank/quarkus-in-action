@@ -3246,6 +3246,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: QUARKUS_OIDC_AUTH_SERVER_URL
+              # TODO: put your own Keycloak URL here!
+              # example:
+              # http://keycloak-mstefank-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/realms/car-rental
               value: http://keycloak-mstefank-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/realms/car-rental
             - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
               value: http://jaeger:4317
@@ -3420,6 +3423,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: QUARKUS_OIDC_AUTH_SERVER_URL
+              # TODO: put your own Keycloak URL here!
+              # example:
+              # http://keycloak-mstefank-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/realms/car-rental
               value: http://keycloak-mstefank-dev.apps.sandbox-m3.1530.p1.openshiftapps.com/realms/car-rental
             - name: QUARKUS_SMALLRYE_GRAPHQL_CLIENT_INVENTORY_URL
               value: http://inventory-service/graphql
