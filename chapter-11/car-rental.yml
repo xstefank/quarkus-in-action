@@ -3566,7 +3566,7 @@ spec:
             - name: QUARKUS_REST_CLIENT_RESERVATION_URL
               value: http://reservation-service
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: OUTSIDE://kafka:9092
+              value: kafka:9092
             - name: QUARKUS_MONGODB_CONNECTION_STRING
               value: mongodb://mongodb-rental:27017
             - name: JAVA_APP_JAR
@@ -3891,7 +3891,7 @@ spec:
             - name: RABBITMQ_HOST
               value: rabbitmq
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: OUTSIDE://kafka:9092
+              value: kafka:9092
             - name: QUARKUS_MONGODB_CONNECTION_STRING
               value: mongodb://mongodb-billing:27017
             - name: JAVA_APP_JAR
