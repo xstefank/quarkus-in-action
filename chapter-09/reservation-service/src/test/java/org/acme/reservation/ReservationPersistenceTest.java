@@ -11,42 +11,41 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @QuarkusTest
 public class ReservationPersistenceTest {
 
+    // TODO replace with TransactionalUniAsserter
     @Test
     @RunOnVertxContext
-    public void testCreateReservation(UniAsserter asserter) {
-        asserter = new UniAsserterInterceptor(asserter) {
+    public void testCreateReservation(UniAsserter uniAsserter) {
+        final UniAsserter asserter = new UniAsserterInterceptor(uniAsserter) {
             @Override
             protected <T> Supplier<Uni<T>> transformUni(Supplier<Uni<T>> uniSupplier) {
                 return () -> Panache.withTransaction(uniSupplier);
             }
         };
 
-        AtomicReference<Long> idWrapper = new AtomicReference<>();
-
+        // clear any previous tests data
         asserter.execute(() -> Reservation.deleteAll());
-        asserter.assertThat(() -> {
-            Reservation reservation = new Reservation();
-            reservation.startDay = LocalDate.now().plus(5, ChronoUnit.DAYS);
-            reservation.endDay = LocalDate.now().plus(12, ChronoUnit.DAYS);
-            reservation.carId = 384L;
-            return reservation.<Reservation>persist();
-        }, reservation -> {
-            Assertions.assertNotNull(reservation.id);
-            idWrapper.set(reservation.id);
-        });
+
+        Reservation reservation = new Reservation();
+        reservation.startDay = LocalDate.now().plusDays(5);
+        reservation.endDay = LocalDate.now().plusDays(12);
+        reservation.carId = 384L;
+
+        asserter.<Reservation>assertThat(() -> reservation.persist(),
+            r -> {
+                Assertions.assertNotNull(r.id);
+                asserter.putData("reservation.id", r.id);
+            });
 
         asserter.assertEquals(() -> Reservation.count(), 1L);
-        asserter.assertThat(() -> Reservation.<Reservation>findById(idWrapper.get()),
-            reservation -> {
-                Assertions.assertNotNull(reservation);
-                Assertions.assertEquals(384L, reservation.carId);
+        asserter.assertThat(() -> Reservation.<Reservation>findById(asserter.getData("reservation.id")),
+            persistedReservation -> {
+                Assertions.assertNotNull(persistedReservation);
+                Assertions.assertEquals(reservation.carId, persistedReservation.carId);
             });
     }
 }

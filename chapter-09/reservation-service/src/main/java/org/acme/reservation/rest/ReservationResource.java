@@ -69,7 +69,10 @@ public class ReservationResource {
                 Log.info("Successfully reserved reservation " + persistedReservation);
 
                 Uni<Void> invoiceUni = invoiceEmitter.send(
-                    new Invoice(reservation, computePrice(reservation)));
+                        new Invoice(reservation, computePrice(reservation)))
+                    .onFailure().invoke(throwable -> System.out.printf(
+                        "Couldn't create invoice for %s. %s%n",
+                        persistedReservation, throwable.getMessage()));
 
                 if (persistedReservation.startDay.equals(LocalDate.now())) {
                     return invoiceUni.chain(() ->

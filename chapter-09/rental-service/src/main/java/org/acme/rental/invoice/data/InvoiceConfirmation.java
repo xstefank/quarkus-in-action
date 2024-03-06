@@ -9,30 +9,37 @@ public class InvoiceConfirmation {
 
     @Override
     public String toString() {
-        return "InvoiceConfirmation{invoice=%s, paid=%s}"
-            .formatted(invoice, paid);
+        return "InvoiceConfirmation{" +
+            "invoice=" + invoice +
+            ", paid=" + paid +
+            '}';
     }
 
     public static final class Invoice {
         public boolean paid;
-        public Reservation reservation;
+        public InvoiceReservation reservation;
 
         @Override
         public String toString() {
-            return "Invoice{paid=%s, reservation=%s}"
-                .formatted(paid, reservation);
+            return "Invoice{" +
+                "paid=" + paid +
+                ", reservation=" + reservation +
+                '}';
         }
     }
 
-    public static final class Reservation {
+    public static final class InvoiceReservation {
         public Long id;
         public String userId;
         public LocalDate startDay;
 
         @Override
         public String toString() {
-            return "Reservation{userId='%s', id=%d, startDay=%s}"
-                .formatted(userId, id, startDay);
+            return "InvoiceReservation{" +
+                "id=" + id +
+                ", userId='" + userId + '\'' +
+                ", startDay=" + startDay +
+                '}';
         }
     }
 }

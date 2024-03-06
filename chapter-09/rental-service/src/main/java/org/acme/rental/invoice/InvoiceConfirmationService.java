@@ -21,11 +21,11 @@ public class InvoiceConfirmationService {
             // retry handling omitted
         }
 
-        InvoiceConfirmation.Reservation reservation =
+        InvoiceConfirmation.InvoiceReservation reservation =
             invoiceConfirmation.invoice.reservation;
 
         Rental.findByUserAndReservationIdsOptional(
-            reservation.userId, reservation.id)
+                reservation.userId, reservation.id)
             .ifPresentOrElse(rental -> {
                 // mark the already started rental as paid
                 rental.paid = true;
