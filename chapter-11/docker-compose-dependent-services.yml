@@ -20,8 +20,6 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - "7777:8080"
-    depends_on:
-      - postgres-keycloak
 
   # Postgres for Reservation service
   postgres-reservation:
@@ -58,7 +56,7 @@ services:
 
   # Kafka
   zookeeper:
-    image: strimzi/kafka:latest-kafka-3.6.0
+    image: quay.io/strimzi/kafka:latest-kafka-3.6.0
     container_name: zookeeper
     command: [
       "sh", "-c",
@@ -70,7 +68,7 @@ services:
       LOG_DIR: /tmp/logs
 
   kafka:
-    image: strimzi/kafka:latest-kafka-3.6.0
+    image: quay.io/strimzi/kafka:latest-kafka-3.6.0
     container_name: kafka
     command: [
       "sh", "-c",
