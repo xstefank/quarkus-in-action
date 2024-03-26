@@ -46,17 +46,6 @@ services:
       - mongodb-billing
       - rabbitmq
 
-  # Keycloak
-  postgres-keycloak:
-    image: docker.io/library/postgres:14
-    container_name: postgres-keycloak
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5300:5432"
-
   keycloak:
     image: quay.io/keycloak/keycloak:21.0.2
     container_name: keycloak
@@ -76,8 +65,6 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - "7777:8080"
-        #depends_on:
-        #- postgres-keycloak
 
   # Postgres for Reservation service
   postgres-reservation:
