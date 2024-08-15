@@ -1,6 +1,6 @@
 = Quarkus in Action -- Book code
 
-This repository represents the book code developed in the book link:https://www.manning.com/books/quarkus-in-action[Quarkus in Action] currently in the Manning Early Access Program (MEAP) with the expected release in spring 2024.
+This repository represents the book code developed in the book link:https://www.manning.com/books/quarkus-in-action[Quarkus in Action] currently in the Manning Early Access Program (MEAP) with the expected release in winter 2024.
 
 ---
 
