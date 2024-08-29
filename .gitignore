@@ -12,3 +12,6 @@ maven-wrapper.jar
 
 .idea
 *.iml
+
+# Quarkus CLI
+.quarkus
