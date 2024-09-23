@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.quarkus.logging.Log;
 import io.smallrye.graphql.client.GraphQLClient;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -33,6 +35,9 @@ public class ReservationResource {
     private final InventoryClient inventoryClient;
     private final RentalClient rentalClient;
 
+    @Inject
+    jakarta.ws.rs.core.SecurityContext context;
+
     public ReservationResource(ReservationsRepository reservations,
                                @GraphQLClient("inventory") GraphQLInventoryClient inventoryClient,
                                @RestClient RentalClient rentalClient) {
@@ -44,11 +49,11 @@ public class ReservationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
     public Reservation make(Reservation reservation) {
+        reservation.userId = context.getUserPrincipal() != null ?
+            context.getUserPrincipal().getName() : "anonymous";
         Reservation result = reservationsRepository.save(reservation);
-        // this is just a dummy value for the time being
-        String userId = "x";
         if (reservation.startDay.equals(LocalDate.now())) {
-            Rental rental = rentalClient.start(userId, result.id);
+            Rental rental = rentalClient.start(reservation.userId, result.id);
             Log.info("Successfully started rental " + rental);
         }
         return result;
@@ -75,5 +80,17 @@ public class ReservationResource {
             }
         }
         return carsById.values();
+    }
+
+    @GET
+    @Path("all")
+    public Collection<Reservation> allReservations() {
+        String userId = context.getUserPrincipal() != null ?
+            context.getUserPrincipal().getName() : null;
+        return reservationsRepository.findAll()
+            .stream()
+            .filter(reservation -> userId == null ||
+                userId.equals(reservation.userId))
+            .collect(Collectors.toList());
     }
 }
