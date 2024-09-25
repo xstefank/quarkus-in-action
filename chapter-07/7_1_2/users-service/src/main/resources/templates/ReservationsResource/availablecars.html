@@ -1,0 +1,33 @@
+{@org.acme.users.model.Car[] cars}
+{@java.time.LocalDate startDate}
+{@java.time.LocalDate endDate}
+<div id="carlist">
+<table>
+  <thead>
+  <tr>
+    <th>Car ID</th>
+    <th>Plate number</th>
+    <th>Manufacturer</th>
+    <th>Model</th>
+    <th>Reservation</th>
+  </tr>
+  </thead>
+  {#for car in cars}
+    <tr>
+    <td>{car.id}</td>
+    <td>{car.licensePlateNumber}</td>
+    <td>{car.manufacturer}</td>
+    <td>{car.model}</td>
+    <td>
+      <form hx-target="#reservations"
+          hx-post="/reserve">
+        <input type="hidden" name="startDate" value="{startDate}"/>
+        <input type="hidden" name="endDate" value="{endDate}"/>
+        <input type="hidden" name="carId" value="{car.id}"/>
+        <input type="submit" value="Reserve"/>
+      </form>
+     </td>
+    </tr>
+  {/for}
+</table>
+</div>
