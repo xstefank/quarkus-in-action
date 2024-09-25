@@ -9,7 +9,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
-import org.acme.reservation.reservation.Reservation;
+import org.acme.reservation.entity.Reservation;
 import org.acme.reservation.rest.ReservationResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
