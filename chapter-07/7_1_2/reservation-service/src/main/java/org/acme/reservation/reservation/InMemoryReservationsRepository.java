@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import jakarta.inject.Singleton;
+import org.acme.reservation.entity.Reservation;
 
 @Singleton
 public class InMemoryReservationsRepository
