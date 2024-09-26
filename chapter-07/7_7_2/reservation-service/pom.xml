@@ -81,6 +81,12 @@
             <artifactId>quarkus-junit5-mockito</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-test-hibernate-reactive-panache</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
