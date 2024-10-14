@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public class Rental extends PanacheMongoEntity {
 
+    public boolean paid;
     public String userId;
     public Long reservationId;
     public LocalDate startDate;
@@ -28,7 +29,8 @@ public class Rental extends PanacheMongoEntity {
     @Override
     public String toString() {
         return "Rental{" +
-            "userId='" + userId + '\'' +
+            "paid=" + paid +
+            ", userId='" + userId + '\'' +
             ", reservationId=" + reservationId +
             ", startDate=" + startDate +
             ", endDate=" + endDate +
