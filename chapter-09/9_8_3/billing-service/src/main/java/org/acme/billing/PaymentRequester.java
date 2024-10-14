@@ -37,11 +37,4 @@ public class PaymentRequester {
             Log.error("Sleep interrupted.", e);
         }
     }
-
-//    /* uncomment in order to consume confirmation here
-    @Incoming("invoices-confirmations")
-    public void consume(InvoiceConfirmation invoiceConfirmation) {
-        System.out.println(invoiceConfirmation);
-    }
-//    */
 }
