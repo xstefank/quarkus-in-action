@@ -18,6 +18,8 @@ import org.acme.reservation.inventory.Car;
 import org.acme.reservation.inventory.GraphQLInventoryClient;
 import org.acme.reservation.inventory.InventoryClient;
 import org.acme.reservation.rental.RentalClient;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestQuery;
@@ -89,6 +91,8 @@ public class ReservationResource {
             reservation.endDay) + 1) * STANDARD_RATE_PER_DAY;
     }
 
+    @Retry(maxRetries = 25, delay = 1000)
+    @Fallback(fallbackMethod = "availabilityFallback")
     @GET
     @Path("availability")
     public Uni<Collection<Car>> availability(@RestQuery LocalDate startDate,
@@ -113,6 +117,11 @@ public class ReservationResource {
             }
             return carsById.values();
         });
+    }
+
+    public Uni<Collection<Car>> availabilityFallback(LocalDate startDate,
+                                                     LocalDate endDate) {
+        return Uni.createFrom().item(List.of());
     }
 
     @GET
