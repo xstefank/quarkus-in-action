@@ -7,7 +7,7 @@ import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.reactive.RestPath;
 
-@RegisterRestClient(baseUri = "http://localhost:8082")
+@RegisterRestClient(configKey = "rental")
 @Path("/rental")
 public interface RentalClient {
 
