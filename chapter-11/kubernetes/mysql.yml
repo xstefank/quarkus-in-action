@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: docker.io/mysql:8.4
+          name: mysql
+          env:
+            - name: MYSQL_DATABASE
+              value: inventory
+            - name: MYSQL_USER
+              value: user
+            - name: MYSQL_PASSWORD
+              value: pass
+            - name: MYSQL_ROOT_PASSWORD
+              value: admin
+          ports:
+            - containerPort: 3306
+              name: mysql
+
