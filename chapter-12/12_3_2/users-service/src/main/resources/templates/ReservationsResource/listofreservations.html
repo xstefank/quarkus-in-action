@@ -1,0 +1,21 @@
+{@org.acme.users.model.Reservation[] reservations}
+<div id="listofreservations">
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Car ID</th>
+    <th>Start day</th>
+    <th>End day</th>
+  </tr>
+  </thead>
+  {#for i in reservations}
+    <tr>
+    <td>{i.id}</td>
+    <td>{i.carId}</td>
+    <td>{i.startDay}</td>
+    <td>{i.endDay}</td>
+    </tr>
+  {/for}
+</table>
+</div>
