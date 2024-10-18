@@ -2,8 +2,6 @@ package org.acme.metadata.extension.test;
 
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -11,16 +9,15 @@ import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 
-public class MetadataExtensionTest {
+public class MetadataExtensionConfigTest {
 
-    // Start unit test with your extension loaded
     @RegisterExtension
     static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
-        .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
+        .overrideConfigKey("quarkus.metadata.path", "/some-other-path");
 
     @Test
-    public void writeYourOwnUnitTest() {
-        RestAssured.when().get("/metadata")
+    public void testMetadataConfigPathChange() {
+        RestAssured.when().get("/some-other-path")
             .prettyPeek()
             .then()
             .statusCode(200)
