@@ -1,0 +1,39 @@
+= Quarkus em Ação -- Código do Livro
+
+Este repositório representa o código-fonte desenvolvido no livro link:https://www.manning.com/books/quarkus-in-action[Quarkus in Action] atualmente se encontra no Programa de Acesso Antecipado da Manning (MEAP), com previsão de lançamento na primavera de 2024.
+
+Dísponível em: link:README.adoc[Inglês] | link:README-pt.adoc[Português (Portuguese)]
+
+> Muito obrigado a cada contribuidor que fez isso acontecer (https://github.com/xstefank/quarkus-in-action/graphs/contributors).
+
+Pastas neste repositório correspondem aos capítulos individuais do livro. O histórico de commits contém as implementações passo-a-passo adicionadas por seção do livro.
+
+- link:chapter-02/README.adoc[Capítulo 2: Your first Quarkus application]
+- link:chapter-03/README.adoc[Capítulo 3: Enhancing developer productivity with Quarkus]
+- link:chapter-04/README.adoc[Capítulo 4: Handling communications]
+- link:chapter-05/README.adoc[Capítulo 5: Testing Quarkus applications]
+- link:chapter-06/README.adoc[Capítulo 6: Exposing and securing web applications]
+- link:chapter-07/README.adoc[Capítulo 7: Database access]
+- link:chapter-08/README.adoc[Capítulo 8: Reactive programming]
+- link:chapter-09/README.adoc[Capítulo 9: Reactive messaging]
+- link:chapter-10/README.adoc[Capítulo 10: Cloud-native application patterns]
+- link:chapter-11/README.adoc[Capítulo 11: Quarkus applications in the cloud]
+- link:chapter-12/README.adoc[Capítulo 12: Custom Quarkus extensions]
+
+O Capítulo 12 contém a aplicação completa de Aluguel de Carros que você começou a construir no Capítulo 4. Muitas coisas podem ser construídas a partir do código-fonte. Sinta-se à vontade para experimentar esta base de código conforme achar necessário.
+
+Se você tem qualquer comentário, ideias, ou propostas, sinta-se à vontade para abrir link:https://github.com/xstefank/quarkus-in-action/issues/new/choose[uma issue] ou link:https://github.com/xstefank/quarkus-in-action/compare[um pull request] neste repositório.
+
+Você também pode entrar em contato diretamente com os autores:
+
+Martin Stefanko
+
+- X - link:https://twitter.com/xstefank[@xstefank]
+- Mastodon - link:https://mastodon.cloud/@xstefank[@xstefank@mastodon.cloud]
+- BlueSky - link:https://bsky.app/profile/xstefank.bsky.social[@xstefank.bsky.social]
+- LinkedIn - https://www.linkedin.com/in/martin-stefanko/
+
+Jan Martiska
+
+- X - link:https://twitter.com/janmartiska[@janmartiska]
+- LinkedIn - https://www.linkedin.com/in/janmartiska/
