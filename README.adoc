@@ -2,8 +2,15 @@
 
 This repository represents the book code developed in the book link:https://www.manning.com/books/quarkus-in-action[Quarkus in Action] released in January 2025.
 
-Free online e-book version - https://developers.redhat.com/e-books/quarkus-action
-Printed version can be baught here - http://mng.bz/7vl7 
+*Free online e-book version - https://developers.redhat.com/e-books/quarkus-action*
+
+*Printed version can be bought here - http://mng.bz/7vl7*
+
+++++
+<p align="center">
+  <img width="300" src="images/book-cover.png">
+</p>
+++++
 
 ---
 
@@ -13,17 +20,17 @@ _Available in_: link:README.adoc[English]
 
 Folders in this repository correspond to the individual chapters in the book. The commit history contains the step by step implementations added per section of the book.
 
-- link:chapter-02/README.adoc[Chapter 2: Your first Quarkus application]
-- link:chapter-03/README.adoc[Chapter 3: Enhancing developer productivity with Quarkus]
-- link:chapter-04/README.adoc[Chapter 4: Handling communications]
-- link:chapter-05/README.adoc[Chapter 5: Testing Quarkus applications]
-- link:chapter-06/README.adoc[Chapter 6: Exposing and securing web applications]
-- link:chapter-07/README.adoc[Chapter 7: Database access]
-- link:chapter-08/README.adoc[Chapter 8: Reactive programming]
-- link:chapter-09/README.adoc[Chapter 9: Quarkus messaging]
-- link:chapter-10/README.adoc[Chapter 10: Cloud-native application patterns]
-- link:chapter-11/README.adoc[Chapter 11: Quarkus applications in the cloud]
-- link:chapter-12/README.adoc[Chapter 12: Custom Quarkus extensions]
+- link:chapter-02[Chapter 2: Your first Quarkus application]
+- link:chapter-03[Chapter 3: Enhancing developer productivity with Quarkus]
+- link:chapter-04[Chapter 4: Handling communications]
+- link:chapter-05[Chapter 5: Testing Quarkus applications]
+- link:chapter-06[Chapter 6: Exposing and securing web applications]
+- link:chapter-07[Chapter 7: Database access]
+- link:chapter-08[Chapter 8: Reactive programming]
+- link:chapter-09[Chapter 9: Quarkus messaging]
+- link:chapter-10[Chapter 10: Cloud-native application patterns]
+- link:chapter-11[Chapter 11: Quarkus applications in the cloud]
+- link:chapter-12[Chapter 12: Custom Quarkus extensions]
 
 The root link:acme-car-rental[acme-car-rental] directory contains the full Car Rental application that you start building from Chapter 4. Everything can be built from source. Feel free to experiment with this codebase as you find fit.
 
@@ -42,3 +49,10 @@ Jan Martiska
 
 - X - link:https://twitter.com/janmartiska[@janmartiska]
 - LinkedIn - https://www.linkedin.com/in/janmartiska/
+
+++++
+<p align="center">
+  <img width="460" src="images/authors.jpeg">
+</p>
+++++
+

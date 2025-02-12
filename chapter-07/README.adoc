@@ -1,0 +1,15 @@
+= Quarkus in Action Chapter 07 - Database access
+
+_Available in_: link:README.adoc[English]
+
+---
+
+Right after the frontend part, we jump straight to the other side -- databases. Quarkus provides a plethora of different options for databases ranging from direct JDBC and traditional JPA (Hibernate ORM) to newly defined Panache library that also comes from the very same Hibernate team and greatly simplifies the ORM development in Quarkus. Which is also why we focus on it in this chapter. You will learn about two different approaches -- active record pattern and the repository pattern. We will also look into the REST data extensions that allow us to generate REST CRUD resources for our entities. Next, we move to the NoSQL world and guess what? We will still use the same Panache API also there! Lastly, we will take a step in to the reactive world and show you how you access your databases in nonblocking way with Hibernate Reactive and its integration with Panache in Quarkus.
+
+After we finish this chapter we will have the following databases setup in the respective services:
+
+- PostgreSQL in the Reservation service (link:7_1_2[7.1.2 Getting started with Panache])
+- MySQL in the Inventory service (link:7_2_1[7.2.1 Utilizing repository pattern with MySQL])
+- MongoDB in the Rental service (link:7_6_1[7.6.1 Utilizing MongoDB with Panache])
+- PostgreSQL with Hibernate Reactive in the Reservation service (link:7_7_1[7.7.1 Using Hibernate Reactive with Panache])
+

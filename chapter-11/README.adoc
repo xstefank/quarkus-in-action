@@ -1,0 +1,25 @@
+= Quarkus in Action Chapter 11 - Quarkus applications in the cloud
+
+_Available in_: link:README.adoc[English]
+
+---
+
+The time has come to put everything we developed so far together and deploy it in the production environment which in our case is the link:https://developers.redhat.com/developer-sandbox[Red Hat Openshift Sandbox]. Individual sections will take us gradually the full OpenShift deployment of Acme Car Rental in several steps:
+
+1. Local development version with Dev Services (what we used so far) -- link:11_1[11.1 Car Rental production]
+2. Local production version with externalized providers -- link:11_1_1[11.1.1 Externalizing providers for independent deployment]
+3. Production version with deployed Docker/Podman images -- link:11_2_4[11.2.4 Pushing Car rental images to quay.io]
+4. Deploying single Quarkus application on Kubernetes -- link:11_3_3[11.3.3 Deploying Quarkus applications on Kubernetes]
+5. Deploying single Quarkus application on OpenShift -- link:11_3_4[11.3.4 Deploying Quarkus applications on OpenShift]
+6. Example of serverless deployment with Knative -- link:11_5_3[11.5.3 Car statistics application with Knative]
+7. Full Acme Car Rental deployment in OpenShift Sandbox -- link:11_6_3[11.6.3 Car rental services deployment with OpenShift Sandbox]
+
+And after step 7, you will see a full Acme Car Rental in your OpenShift Sandbox instance!
+
+
+++++
+<p align="center">
+  <img width="80%" src="../images/11-final.png">
+</p>
+++++
+

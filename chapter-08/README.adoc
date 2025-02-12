@@ -1,0 +1,11 @@
+= Quarkus in Action Chapter 08 - Reactive programming
+
+_Available in_: link:README.adoc[English]
+
+---
+
+The were a few places in the book so far where the learning journey took us into the reactive world. Especially, the last section in the previous chapter. Now is the time to embrace reactive programming and learn what it can bring into your applications. You will learn about the Mutiny library and its very simple API that we can utilize almost everywhere in Quarkus (link:8_2_2/mutiny-example[8.2.2 Mutiny API]). We will also look into whether you might need it or not. Reactive programming is of course a very discutable and opinionated topic, so no one is forced to use it. Since project Loom (virtual threads) became a finalized feature in JDK 21, you don't even have to learn reactive programming to get similar performance characteristics. However, there are still some problem with project Loom that we describe in link:8_5_1/loom-example[8.5.1 Project Loom in Quarkus]. The final choice of whether to use the reactive programming or project Loom or neither is however not restricted in any way. In Quarkus, you can mix and match all paradigms as you see fit. Even in the same class.
+
+
+This chapter prepares us for the inclusion of asynchronous massage passing in our Acme Car Rental application in the next chapter.
+

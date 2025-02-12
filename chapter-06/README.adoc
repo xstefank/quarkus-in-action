@@ -1,0 +1,18 @@
+= Quarkus in Action Chapter 06 - Exposing and securing web applications
+
+_Available in_: link:README.adoc[English]
+
+---
+
+This chapter moves to the front end side of development. We create our next car rental service call the Users service in link:6_1[6.1 Creating a secured web application] section. You will also learn how to use a Keycloak instance (automatically started and managed through Dev Services) to authenticate your users with very little configuration. Lastly, you will also deploy a very simple production version of Keycloak using containers (Docker or Podman) in link:production[6.4.1 Running Keycloak and PostgreSQL as container] and learn how to set up your applications (Users service and Reservation service) to connect to it in link:6_4_2[6.4.2 Wiring the services to use Keycloak].
+
+The final version of the application after this chapter looks like this:
+
+
+++++
+<p align="center">
+  <img width="80%" src="../images/06-final-arch.png">
+</p>
+++++
+
+

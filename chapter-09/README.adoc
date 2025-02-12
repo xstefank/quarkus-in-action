@@ -1,0 +1,17 @@
+= Quarkus in Action Chapter 09 - Quarkus messaging
+
+_Available in_: link:README.adoc[English]
+
+---
+
+Scaling of synchronous communication protocols that we learned about in chapter 4 is restricted by the unreliable nature of networks (link:https://en.wikipedia.org/wiki/CAP_theorem[CAP theorem]). Which is why Quarkus provides you with a very simple integration of different messaging protocols based on the asynchronous message passing jointly called Quarkus messaging. Even if the integration is based on the MicroProfile Reactive Messaging specification (link:9_3_2/reactive-messaging-example[9.3.2 Reactive messaging API]) and its SmallRye Reactive Messaging implementation we use in Quarkus, users are not required to write reactive code to utilize asynchronous messaging. In this chapter, we will learn how to integrate our car rental services using two messaging providers -- Apache Kafka (link:9_6_1[9.6.1 Kafka integration in the Rental service]) and RabbitMQ (link:9_7[9.7 Quarkus messaging with RabbitMQ]). We will also create our final and purely reactive car rental service, the Billing service in link:9_8[9.8 Car Rental Billing service] that integrates both providers in a single service. You will see how Quarkus make all this development extremely easy with Dev Services that automatically share all providers between the relevant services.
+
+After this chapter, we will have the following architecture:
+
+
+++++
+<p align="center">
+  <img width="80%" src="../images/09-final-arch.png">
+</p>
+++++
+

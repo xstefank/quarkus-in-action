@@ -1,0 +1,26 @@
+= Quarkus in Action Chapter 03 - Enhancing developer productivity with Quarkus
+
+_Available in_: link:README.adoc[English]
+
+---
+
+This chapter explores various different productivity enhancements included in the Quarkus's Dev mode. You can start dev mode with `./mvnw quarkus:dev` (maven) or `quarkus dev` (CLI):
+
+[source,bash]
+----
+__  ____  __  _____   ___  __ ____  ______ 
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+2025-02-12 10:27:36,431 INFO  [io.quarkus] (Quarkus Main Thread) quarkus-in-action 1.0.0-SNAPSHOT on JVM (powered by Quarkus 3.15.1) started in 1.257s. Listening on: http://localhost:8080
+
+2025-02-12 10:27:36,433 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2025-02-12 10:27:36,433 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, rest, smallrye-context-propagation, vertx]
+----
+
+The Dev mode is interactive, just press `h` key to see the options.
+
+Dev UI can be opened at `http://localhost:8080/q/dev-ui` or by simply pressing `d` in the Dev mode terminal.
+
+Continuous testing can be started by pressing `r` in the Dev mode terminal.
+

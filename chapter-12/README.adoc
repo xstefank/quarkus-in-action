@@ -1,0 +1,12 @@
+= Quarkus in Action Chapter 12 - Custom Quarkus extensions
+
+_Available in_: link:README.adoc[English]
+
+---
+
+The last chapter of this book focuses on the extension development. This is not and easy task, but it nicely puts the concepts explained in the book into perspective since you will be able to directly see how the individual pieces of Quarkus's magic set in place. We will develop a small informative extension called "metadata" that outputs some metadata about your Quarkus application. We will how you bootstrap an extension project in link:12_3_1[12.3.1 Creating the project]. Then we explore various pieces of extension development like addition of custom configuration (link:12_3_2[12.3.2 Extending the configuration model]), exposing HTTP interface (link:12_3_3[12.3.3 Creating the HTTP handler]), or creating a recorder object that records the bytecode that can be replayed during runtime (link:12_3_4[12.3.4 Creating the recorder]). Later, we put everything together in the processor class (link:12_3_5[12.3.5 Creating the processor]). For completeness, we finish Quarkus in Action with a few tests for our newly created extension.
+
+Congratulations! You've got to the end of the book. Hopefully, you found the presented content valuable and helpful. Thank you for reading our book!
+
+image:../images/book-cover.png[]
+

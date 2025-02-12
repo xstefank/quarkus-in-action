@@ -1,0 +1,28 @@
+= Quarkus in Action Chapter 05 - Testing Quarkus applications
+
+_Available in_: link:README.adoc[English]
+
+---
+
+Chapter 05 builds on top of the Reservation service we built in Chapter 04 and showcases various test scenarios, including:
+
+- Simple unit tests - link:5_1_1[5.1.1 Writing a simple test for the Reservation repository]
+- Native tests - link:5_2_1[5.2.1 Writing a test for the Reservation resource]
+- Mocking with CDI alternatives - link:5_3_1[5.3.1 Mocking by replacing implementations]
+- Mocking with Mockito = link:5_3_2[5.3.2 Mocking with Mockito]
+
+After this chapter, you will have the following test available in the Reservation service:
+
+[source,bash]
+----
+$ tree reservation-service/src/test/java 
+reservation-service/src/test/java
+└── org
+    └── acme
+        └── reservation
+            ├── ReservationRepositoryTest.java
+            ├── ReservationResourceIT.java
+            └── ReservationResourceTest.java
+----
+
+

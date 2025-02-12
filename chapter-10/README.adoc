@@ -1,0 +1,8 @@
+= Quarkus in Action Chapter 10 - Cloud-native application patterns
+
+_Available in_: link:README.adoc[English]
+
+---
+
+After the previous chapter we have all communication covered but if we are about to deploy our services to cloud platforms (Kubernetes or OpenShift), we should also prepare them for the various scenarios that they can hit there. These are jointly covered by a set of MicroProfile specifications. In this chapter, we will go over the main specifications and their SmallRye implementation used in Quarkus, to demonstrate how you can easily extend your services to provide for instance health checks (link:10_2_1[10.2.1 Monitoring the health of Car Rental]), metrics (link:10_3_6[10.3.6 Monitoring metrics of Car Rental]), observability (link:10_4_2[10.4.2 Adding tracing capabilities to Car Rental]), or fault tolerance of synchronous communication (link:10_5_1[10.5.1 Adding Fault Tolerance to Car Rental]). We will focus our development on the Inventory service but all of the demonstrated patterns can be applied to any of the other services too.
+

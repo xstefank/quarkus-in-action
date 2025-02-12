@@ -1,0 +1,25 @@
+= Quarkus in Action Chapter 04 - Handling communications
+
+_Available in_: link:README.adoc[English]
+
+---
+
+Chapter 04 is the first chapter where we start creating our Acme Car Rental application. We start by creating first three services:
+
+- Reservation service in section link:4_2[4.2 Car rental Reservation service]
+- Rental service in section link:4_3[4.3 Usint the REST client]
+- Inventory service in section link:4_5_1[4.5.1 Exposing the Inventory service over GraphQL]
+
+Additionally, we also create an Inventory CLI application that demostrates the gRPC client capabilities in Quarkus:
+
+- Inventory CLI in section link:4_8_2[4.8.2 Using a gRPC client with Quarkus]
+
+The final Acme Car Rental version after this chapter looks like this:
+
+++++
+<p align="center">
+  <img width="80%" src="../images/04-final-arch.png">
+</p>
+++++
+
+

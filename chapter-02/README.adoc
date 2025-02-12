@@ -1,0 +1,26 @@
+= Quarkus in Action Chapter 02 - Your first Quarkus application
+
+_Available in_: link:README.adoc[English]
+
+---
+
+In this first coding chapter, we will learn how you can start working with Quarkus. You will learn how you can generate Quarkus application in three different ways:
+
+- Quarkus Maven plugin
+- Quarkus CLI
+- Quarkus generator site (code.quarkus.io)
+
+All subsections in this directory container the same starting quarkus-in-action application that we use to explain the Quarkus project structure and how you can run Quarkus applications. You can compile all the applications to GraalVM native with the `-Pnative` flag.
+
+[source,bash]
+----
+__  ____  __  _____   ___  __ ____  ______ 
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+2025-02-12 10:24:10,817 INFO  [io.quarkus] (Quarkus Main Thread) quarkus-in-action 1.0.0-SNAPSHOT on JVM (powered by Quarkus 3.15.1) started in 1.279s. Listening on: http://localhost:8080
+
+2025-02-12 10:24:10,819 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2025-02-12 10:24:10,820 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, rest, smallrye-context-propagation, vertx]
+----
+
