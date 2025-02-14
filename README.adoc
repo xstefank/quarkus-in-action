@@ -14,7 +14,7 @@ This repository represents the book code developed in the book link:https://www.
 
 ---
 
-_Available in_: link:README.adoc[English]
+_Available in_: link:README.adoc[English] | link:README-pt.adoc[Português (Portuguese)]
 
 > Great thanks to every contributor that made this happen (https://github.com/xstefank/quarkus-in-action/graphs/contributors).
 
